@@ -1,7 +1,8 @@
-package com.erdees.toyswap
+package com.erdees.toyswap.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.erdees.toyswap.Utils
 import com.erdees.toyswap.databinding.ActivityMainBinding
 import com.erdees.toyswap.fragments.TestFragment
 
@@ -18,7 +19,11 @@ class MainActivity : AppCompatActivity() {
 
         viewBinding.helloWorldTV.text = "View Binding WORKs!!!!"
             viewBinding.helloWorldTV.setOnClickListener{
-            Utils.openFragment(TestFragment.newInstance(),TestFragment.TAG,supportFragmentManager)
+                Utils.openFragment(
+                    TestFragment.newInstance(),
+                    TestFragment.TAG,
+                    supportFragmentManager
+                )
             }
     }
 }
