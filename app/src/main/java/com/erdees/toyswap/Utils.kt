@@ -1,5 +1,8 @@
 package com.erdees.toyswap
 
+import android.text.TextUtils
+import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -19,6 +22,24 @@ object Utils {
         }
     }
 
+    fun View.makeGone(){
+        this.visibility = View.GONE
+    }
 
+    fun View.makeInvisible(){
+        this.visibility = View.INVISIBLE
+    }
+
+    fun View.makeVisible(){
+        this.visibility = View.VISIBLE
+    }
+
+    fun View.makeToast(message : String){
+        Toast.makeText(this.context,message,Toast.LENGTH_SHORT).show()
+    }
+
+    fun String.isEmailValid(): Boolean {
+        return !TextUtils.isEmpty(this) && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
+    }
 
 }
