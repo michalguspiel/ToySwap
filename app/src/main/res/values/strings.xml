@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Toy Swap</string>
-    <string name="continue_without_signing_in">Continue without signing in.</string>
+    <string name="continue_without_signing_in">Continue as guest</string>
     <string name="login_with_google">Login with google</string>
-    <string name="login_with_email">Login with email</string>
     <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
     <string name="toyswap">ToySwap</string>
 </resources>
