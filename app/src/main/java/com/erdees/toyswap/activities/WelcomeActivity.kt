@@ -4,7 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.erdees.toyswap.Constants.RC_SIGN_IN
 import com.erdees.toyswap.R
+import com.erdees.toyswap.Utils.makeGone
+import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.databinding.WelcomeActivityBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -23,7 +27,6 @@ class WelcomeActivity : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
 
-    private val RC_SIGN_IN = 21415
 
     override fun onStart() {
         super.onStart()
@@ -59,9 +62,32 @@ class WelcomeActivity : AppCompatActivity() {
         binding.signWithGoogleBtn.setOnClickListener {
             signInWithGoogle()
         }
-
+        binding.welcomeSignInSwitch.setOnClickListener {
+            checkSignIn()
+        }
+        binding.welcomeSignUpSwitch.setOnClickListener {
+            checkSignUp()
+        }
     }
 
+
+    private fun checkSignIn(){
+        binding.welcomeSignInRowActive.makeVisible()
+        binding.welcomeSignInRowInactive.makeGone()
+        binding.welcomeSignUpRowActive.makeGone()
+        binding.welcomeSignUpRowInactive.makeVisible()
+        binding.welcomeSignInSwitch.setTextColor(ContextCompat.getColor(this,R.color.colorPrimary))
+        binding.welcomeSignUpSwitch.setTextColor(ContextCompat.getColor(this,R.color.light_gray))
+    }
+
+    private fun checkSignUp(){
+        binding.welcomeSignInRowActive.makeGone()
+        binding.welcomeSignInRowInactive.makeVisible()
+        binding.welcomeSignUpRowActive.makeVisible()
+        binding.welcomeSignUpRowInactive.makeGone()
+        binding.welcomeSignInSwitch.setTextColor(ContextCompat.getColor(this,R.color.light_gray))
+        binding.welcomeSignUpSwitch.setTextColor(ContextCompat.getColor(this,R.color.colorPrimary))
+    }
 
     private fun updateUI(user: FirebaseUser?){
         if(user == null) return
@@ -80,11 +106,12 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun openLoginActivity() {
-
+    val loginActivity = Intent(this,LoginActivity::class.java)
+        startActivity(loginActivity)
     }
 
     private fun continueWithoutLogging() {
-
+    openMainActivity()
     }
 
     private fun firebaseAuthWithGoogle(idToken: String) {

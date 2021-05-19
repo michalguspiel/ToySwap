@@ -1,5 +1,6 @@
 package com.erdees.toyswap
 
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -19,6 +20,16 @@ object Utils {
         }
     }
 
+    fun View.makeGone(){
+        this.visibility = View.GONE
+    }
 
+    fun View.makeInvisible(){
+        this.visibility = View.INVISIBLE
+    }
+
+    fun View.makeVisible(){
+        this.visibility = View.VISIBLE
+    }
 
 }
