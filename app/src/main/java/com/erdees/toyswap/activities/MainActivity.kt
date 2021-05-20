@@ -7,6 +7,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+/**TODO ADD MAIN LOGIC +  SIDE NAVIGATION OR BOTTOM NAVIGATION IDK YET DECIDE TMRW  + SMOOTH FRAGMENT TRANSITIONS IN MENU
+ * TODO FRAGMENTS: MY ACC, BROWSE ITEMS,MESSAGES,*/
 
 class MainActivity : AppCompatActivity() {
 
