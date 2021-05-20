@@ -63,6 +63,7 @@ class WelcomeActivity : AppCompatActivity() {
             signInWithMail()
         }
         binding.signUpWithEmailBtn.setOnClickListener {
+            /**TODO EXTRACT THIS LOGIC AS SEPARATE CLASS PASSWORD? AND WRITE UNIT TESTS!*/
             Log.i(TAG,"${binding.signUpPasswordInput.text}      toString: ${binding.signUpPasswordInput.text.toString()}")
             if(!binding.signUpWithEmailInput.text.toString().isEmailValid()){
                 view.makeToast("Provide valid email!")
