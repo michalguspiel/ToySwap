@@ -1,5 +1,6 @@
 package com.erdees.toyswap
 
+import com.erdees.toyswap.activities.welcomeActivity.Registration
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

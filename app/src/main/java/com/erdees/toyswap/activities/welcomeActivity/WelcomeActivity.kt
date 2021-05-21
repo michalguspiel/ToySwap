@@ -1,4 +1,4 @@
-package com.erdees.toyswap.activities
+package com.erdees.toyswap.activities.welcomeActivity
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,10 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.erdees.toyswap.Constants.RC_SIGN_IN
 import com.erdees.toyswap.R
-import com.erdees.toyswap.Registration
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeToast
 import com.erdees.toyswap.Utils.makeVisible
+import com.erdees.toyswap.activities.MainActivity
 import com.erdees.toyswap.databinding.WelcomeActivityBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -82,28 +82,7 @@ class WelcomeActivity : AppCompatActivity() {
             checkSignUp()
         }
 
-
     }
-
-
-
-    private fun passwordTooShort(password: String): Boolean{
-        return password.length < 7
-    }
-
-    private fun passwordsAreSame(password: String,confirmPassword: String):Boolean{
-        return password == confirmPassword
-    }
-
-    private fun passwordContainsDigit(password : String):Boolean{
-        return password.any { it.isDigit() }
-    }
-
-    private fun passwordIsOnlyDigits(password: String) : Boolean {
-        return password.all { it.isDigit() }
-    }
-
-
 
     private fun checkSignIn(){
         binding.welcomeSignInRowActive.makeVisible()
@@ -135,7 +114,7 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun openMainActivity(){
-        val mainActivity = Intent(this,MainActivity::class.java)
+        val mainActivity = Intent(this, MainActivity::class.java)
         startActivity(mainActivity)
     }
 
