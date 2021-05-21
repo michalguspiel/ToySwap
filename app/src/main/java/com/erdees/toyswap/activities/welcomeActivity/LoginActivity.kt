@@ -24,7 +24,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class WelcomeActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: WelcomeActivityBinding
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -115,6 +115,7 @@ class WelcomeActivity : AppCompatActivity() {
 
     private fun openMainActivity(){
         val mainActivity = Intent(this, MainActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(mainActivity)
     }
 
