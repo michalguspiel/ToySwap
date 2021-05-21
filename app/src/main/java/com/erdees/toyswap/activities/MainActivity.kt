@@ -2,6 +2,9 @@ package com.erdees.toyswap.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
+import com.erdees.toyswap.R
 import com.erdees.toyswap.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -23,9 +26,11 @@ class MainActivity : AppCompatActivity() {
         val view = viewBinding.root
         setContentView(view)
 
-        viewBinding.helloWorldTV.text = "View Binding WORKs!!!!"
-            viewBinding.helloWorldTV.setOnClickListener{
-                auth.signOut()
-            }
+        val navController = findNavController(R.id.nav_host_fragment)
+
+        viewBinding.bottomNavigation.setupWithNavController(navController)
+
+
+
     }
 }

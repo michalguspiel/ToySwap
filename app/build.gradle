@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.erdees.toyswap"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -41,6 +41,8 @@ android {
 
 
 dependencies {
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    def nav_version = "2.3.5"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.2'
@@ -64,6 +66,13 @@ dependencies {
     // Also declare the dependency for the Google Play services library and specify its version
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
 
+    //JETPACK
+    implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
+    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+                // Feature module Support
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
+                // Jetpack Compose Integration
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha01")
 
 
 
@@ -76,7 +85,8 @@ dependencies {
     testImplementation "org.powermock:powermock-module-junit4-rule:1.6.2"
     testImplementation "org.powermock:powermock-api-mockito:1.6.2"
     testImplementation "org.powermock:powermock-classloading-xstream:1.6.2"
-
+          // Testing Navigation
+    androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
 
 
 
