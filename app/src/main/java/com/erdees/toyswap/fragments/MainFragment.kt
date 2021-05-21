@@ -5,8 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import com.erdees.toyswap.databinding.FragmentMainBinding
 
 
@@ -15,7 +13,6 @@ class MainFragment : Fragment(){
     private var _binding : FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var navController : NavController
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,8 +21,6 @@ class MainFragment : Fragment(){
         _binding = FragmentMainBinding.inflate(inflater,container,false)
         val view = binding.root
 
-        /**NAVIGATION*/
-        /**BOTTOM MENU*/
 
 
         return view
@@ -41,9 +36,6 @@ class MainFragment : Fragment(){
         _binding = null
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        navController = Navigation.findNavController(view)
-    }
+
 
 }
