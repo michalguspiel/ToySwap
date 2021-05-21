@@ -3,12 +3,13 @@ package com.erdees.toyswap.activities
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.erdees.toyswap.Constants.RC_SIGN_IN
 import com.erdees.toyswap.R
-import com.erdees.toyswap.Utils.isEmailValid
+import com.erdees.toyswap.Registration
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeToast
 import com.erdees.toyswap.Utils.makeVisible
@@ -28,7 +29,7 @@ class WelcomeActivity : AppCompatActivity() {
     private lateinit var binding: WelcomeActivityBinding
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
-
+    private lateinit var view: View
 
     override fun onStart() {
         super.onStart()
@@ -41,7 +42,7 @@ class WelcomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = WelcomeActivityBinding.inflate(layoutInflater)
-        val view = binding.root
+        view = binding.root
         setContentView(view)
         checkSignIn() // initially screen starts with checked sign in value
 
@@ -63,31 +64,13 @@ class WelcomeActivity : AppCompatActivity() {
             signInWithMail()
         }
         binding.signUpWithEmailBtn.setOnClickListener {
-            /**TODO EXTRACT THIS LOGIC AS SEPARATE CLASS PASSWORD? AND WRITE UNIT TESTS!*/
-            Log.i(TAG,"${binding.signUpPasswordInput.text}      toString: ${binding.signUpPasswordInput.text.toString()}")
-            if(!binding.signUpWithEmailInput.text.toString().isEmailValid()){
-                view.makeToast("Provide valid email!")
-                return@setOnClickListener
+            val registration = Registration(binding.signUpPasswordInput.text.toString(),
+                binding.signUpConfirmPasswordInput.text.toString(),
+                binding.signUpWithEmailInput.text.toString())
+            if(!registration.isLegit()){
+                view.makeToast(registration.errorMessage)
             }
-            if(!passwordsAreSame()){
-                view.makeToast("Passwords are not same!")
-                return@setOnClickListener
-            }
-            if(passwordTooShort()){
-                view.makeToast("Password too short!")
-                return@setOnClickListener
-            }
-            if(!passwordContainsDigit()){
-                view.makeToast("Password has to contain at least one digit!")
-                return@setOnClickListener
-            }
-            if(passwordIsOnlyDigits()){
-                view.makeToast("Password can't contain digits only!")
-                return@setOnClickListener
-            }
-            if(passwordContainsDigit() && !passwordIsOnlyDigits() && binding.signUpWithEmailInput.text.toString().isEmailValid()){
-                signUp()
-            }
+            else signUp(registration)
         }
         binding.signWithGoogleBtn.setOnClickListener {
             signInWithGoogle()
@@ -104,20 +87,20 @@ class WelcomeActivity : AppCompatActivity() {
 
 
 
-    private fun passwordTooShort(): Boolean{
-        return binding.signUpPasswordInput.text.toString().length < 7
+    private fun passwordTooShort(password: String): Boolean{
+        return password.length < 7
     }
 
-    private fun passwordsAreSame():Boolean{
-       return binding.signUpPasswordInput.text.toString() == binding.signUpConfirmPasswordInput.text.toString()
+    private fun passwordsAreSame(password: String,confirmPassword: String):Boolean{
+        return password == confirmPassword
     }
 
-    private fun passwordContainsDigit():Boolean{
-        return binding.signUpPasswordInput.text.toString().any { it.isDigit() }
+    private fun passwordContainsDigit(password : String):Boolean{
+        return password.any { it.isDigit() }
     }
 
-    private fun passwordIsOnlyDigits() : Boolean {
-        return binding.signUpPasswordInput.text.toString().all { it.isDigit() }
+    private fun passwordIsOnlyDigits(password: String) : Boolean {
+        return password.all { it.isDigit() }
     }
 
 
@@ -156,8 +139,8 @@ class WelcomeActivity : AppCompatActivity() {
         startActivity(mainActivity)
     }
 
-    private fun signUp(){
-        auth.createUserWithEmailAndPassword(binding.signUpWithEmailInput.text.toString(),binding.signUpPasswordInput.text.toString())
+    private fun signUp(registration: Registration){
+        auth.createUserWithEmailAndPassword(registration.mail,registration.password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
