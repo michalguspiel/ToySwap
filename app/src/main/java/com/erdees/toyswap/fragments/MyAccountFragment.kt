@@ -1,11 +1,14 @@
 package com.erdees.toyswap.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.erdees.toyswap.activities.MainActivity
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
+import com.erdees.toyswap.fragments.dialogs.ChangeAddressDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -28,8 +31,14 @@ class MyAccountFragment : Fragment() {
 
         auth = Firebase.auth
 
-        binding.button2.setOnClickListener {
+        binding.changeAddressBtn.setOnClickListener {
+            val changeAddressDialog = ChangeAddressDialog.newInstance()
+            changeAddressDialog.show(parentFragmentManager,ChangeAddressDialog.TAG)
+        }
+
+        binding.logoutButton.setOnClickListener {
         auth.signOut()
+            restartActivity()
         }
 
         return view
@@ -38,6 +47,11 @@ class MyAccountFragment : Fragment() {
     companion object {
         fun newInstance(): MyAccountFragment = MyAccountFragment()
         const val TAG = "MyAccountFragment"
+    }
+
+    private fun restartActivity(){
+        val mainActivity = Intent(context,MainActivity::class.java)
+        startActivity(mainActivity)
     }
 
     override fun onDestroyView() {
