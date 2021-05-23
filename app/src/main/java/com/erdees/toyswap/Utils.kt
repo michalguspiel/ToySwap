@@ -6,8 +6,10 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.snackbar.Snackbar
 
 object Utils {
+
 
 
     fun openFragment(fragment: Fragment, fragmentTag: String, fm: FragmentManager) {
@@ -36,6 +38,10 @@ object Utils {
 
     fun View.makeToast(message : String){
         Toast.makeText(this.context,message,Toast.LENGTH_SHORT).show()
+    }
+
+    fun View.makeSnackbar(message: String){
+        Snackbar.make(this,message,Snackbar.LENGTH_SHORT).show()
     }
 
     fun String.isEmailValid(): Boolean {

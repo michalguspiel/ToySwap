@@ -13,4 +13,7 @@
     <item android:title="Messages"
         android:id="@+id/nav_messagesFragment"
         android:icon="@drawable/ic_baseline_person_24"/>
+    <item android:title="Items"
+        android:id="@+id/nav_inventoryFragment"
+        android:icon="@drawable/ic_baseline_home_24" />
 </menu>
