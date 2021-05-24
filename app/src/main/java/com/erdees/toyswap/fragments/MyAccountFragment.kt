@@ -1,5 +1,6 @@
 package com.erdees.toyswap.fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +16,8 @@ import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.activities.MainActivity
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
 import com.erdees.toyswap.fragments.dialogs.ChangeAddressDialog
-import com.erdees.toyswap.fragments.dialogs.DialogListener
+import com.erdees.toyswap.fragments.dialogs.MyAccountDialogsListener
+import com.erdees.toyswap.fragments.dialogs.ReAuthenticateDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -25,14 +27,14 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 
-class MyAccountFragment : Fragment(),DialogListener {
+class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fragment(),MyAccountDialogsListener {
 
     private var _binding: FragmentMyAccountBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db : FirebaseFirestore
-    private lateinit var user : FirebaseUser
+    private  lateinit var user : FirebaseUser
     private lateinit var userDocRef : DocumentReference
 
     override fun onCreateView(
@@ -63,12 +65,21 @@ class MyAccountFragment : Fragment(),DialogListener {
             restartActivity()
         }
 
+        binding.changePasswordBtn.setOnClickListener {
+            openDialogToReAuthenticate()
+        }
+
         return view
     }
 
     companion object {
-        fun newInstance(): MyAccountFragment = MyAccountFragment()
+        fun newInstance(): MyAccountFragment = MyAccountFragment(null)
         const val TAG = "MyAccountFragment"
+    }
+
+    private fun openDialogToReAuthenticate(){
+    val reAuthDialog = ReAuthenticateDialog(false)
+        reAuthDialog.show(childFragmentManager,ReAuthenticateDialog.TAG)
     }
 
     private fun restartActivity() {
@@ -77,6 +88,7 @@ class MyAccountFragment : Fragment(),DialogListener {
     }
 
     private fun setButtonsAccordingly(){
+    //    Log.i(TAG, user.getIdToken(false).result.toString())
        if(user.getIdToken(false).result?.signInProvider == "google.com") binding.changePasswordBtn.makeGone()
        else binding.changePasswordBtn.makeVisible()
     }
@@ -85,17 +97,18 @@ class MyAccountFragment : Fragment(),DialogListener {
         userDocRef.get().addOnSuccessListener {
             val userName = it["name"].toString()
             val userMail = it["emailAddress"].toString()
-            if(!userName.isNullOrBlank())binding.accountFullNameTV.text = userName
+            if(userName.isNotBlank())binding.accountFullNameTV.text = userName
             else binding.accountFullNameTV.text = ""
 
             binding.accountEmailTV.text = userMail
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun ImageView.setAvatar(){
     userDocRef.get().addOnSuccessListener {
-        val thisUserProfilePictureUrl =  it["avatar"]
-        if(thisUserProfilePictureUrl != "") {
+        val thisUserProfilePictureUrl =  it["avatar"].toString()
+        if(thisUserProfilePictureUrl.isNotBlank() && thisUserProfilePictureUrl != "null") {
             Glide.with(requireActivity())
                 .load(thisUserProfilePictureUrl)
                 .centerCrop()
@@ -116,11 +129,12 @@ class MyAccountFragment : Fragment(),DialogListener {
             val postCode = (it["addressPostCode"].toString())
             val city = (it["addressCity"].toString())
             Log.i(TAG," $street    ,    $postCode,    $city")
-            if(street.isNullOrEmpty() && postCode.isNullOrEmpty() && city.isNullOrEmpty()) setEmptyFields()
+            if(street.isEmpty() && postCode.isEmpty() && city.isEmpty()) setEmptyFields()
             else setFields(street,postCode,city)
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setEmptyFields(){
         binding.addressTV.text = "You have not provided address."
         binding.addressPostCodeTV.makeGone()
@@ -135,7 +149,9 @@ class MyAccountFragment : Fragment(),DialogListener {
         binding.addressCityTV.makeVisible()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun ImageView.setAnonProfilePicture(){
+        Log.i(TAG,"SettingAnonPic")
         Glide.with(requireActivity())
             .load(Constants.NO_PROFILE_PICTURE_URL)
             .centerCrop()
@@ -150,7 +166,7 @@ class MyAccountFragment : Fragment(),DialogListener {
         _binding = null
     }
 
-    override fun OnCloseDialog() {
+    override fun onCloseDialog() {
         setAddressAccordingly()
     }
 

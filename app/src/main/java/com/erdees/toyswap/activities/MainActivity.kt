@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
-import com.erdees.toyswap.activities.welcomeActivity.LoginActivity
+import com.erdees.toyswap.activities.loginActivity.LoginActivity
 import com.erdees.toyswap.databinding.ActivityMainBinding
 import com.erdees.toyswap.fragments.AddItemFragment
 import com.erdees.toyswap.fragments.MainFragment
@@ -20,9 +20,9 @@ import com.google.firebase.ktx.Firebase
 class MainActivity : AppCompatActivity() {
 
     /**Fragments*/
-    val mainFragment = MainFragment.newInstance()
-    val myAccountFragment = MyAccountFragment.newInstance()
-    val addFragment = AddItemFragment.newInstance()
+    private val mainFragment = MainFragment.newInstance()
+    private val myAccountFragment = MyAccountFragment.newInstance()
+    private val addFragment = AddItemFragment.newInstance()
 
     lateinit var auth: FirebaseAuth
 
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.nav_myAccountFragment -> {
-                    if(auth.currentUser != null) Utils.openFragment(myAccountFragment,MyAccountFragment.TAG,supportFragmentManager)
+                    if(auth.currentUser != null)Utils.openFragment(myAccountFragment,MyAccountFragment.TAG,supportFragmentManager)
                     else openLoginActivity()
                 }
                 else -> {}
