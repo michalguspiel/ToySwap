@@ -18,7 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class ChangeAddressDialog(private val listener: DialogListener) : DialogFragment() {
+class ChangeAddressDialog(private val listener: MyAccountDialogsListener) : DialogFragment() {
 
     private var _binding : DialogChangeAddressBinding? = null
             private val binding get() = _binding!!
@@ -78,7 +78,7 @@ class ChangeAddressDialog(private val listener: DialogListener) : DialogFragment
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        listener.OnCloseDialog()
+        listener.onCloseDialog()
         super.onDismiss(dialog)
     }
 

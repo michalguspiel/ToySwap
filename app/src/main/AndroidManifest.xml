@@ -16,7 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.welcomeActivity.LoginActivity">
+        <activity android:name=".activities.loginActivity.LoginActivity">
         </activity>
 
 
