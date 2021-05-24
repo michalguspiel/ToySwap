@@ -1,16 +1,15 @@
 package com.erdees.toyswap.fragments.dialogs
 
-import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color.TRANSPARENT
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.erdees.toyswap.Utils.makeSnackbar
+import com.erdees.toyswap.Utils.makeToast
 import com.erdees.toyswap.databinding.DialogChangeAddressBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -19,7 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class ChangeAddressDialog(context: Context,val listener : DialogListener) : DialogFragment() {
+class ChangeAddressDialog(private val listener: DialogListener) : DialogFragment() {
 
     private var _binding : DialogChangeAddressBinding? = null
             private val binding get() = _binding!!
@@ -50,21 +49,27 @@ class ChangeAddressDialog(context: Context,val listener : DialogListener) : Dial
             }
 
         binding.addressSubmitBtn.setOnClickListener {
-            Log.i(TAG,parentFragment.toString() + parentFragment?.view.toString())
-            userDocRef.update(
-                "addressStreet", binding.addressStreet.text.toString(),
-                "addressPostCode",binding.addressPostCode.text.toString(),
-                "addressCity",binding.addressCity.text.toString()
-            )
-            this.dismiss()
-            parentFragment?.view?.makeSnackbar("Address updated!")
+            if (atLeastOneInputIsEmpty()) view.makeToast("Fill every field.")
+            else {
+                userDocRef.update(
+                    "addressStreet", binding.addressStreet.text.toString(),
+                    "addressPostCode", binding.addressPostCode.text.toString(),
+                    "addressCity", binding.addressCity.text.toString()
+                )
+                this.dismiss()
+                parentFragment?.view?.makeSnackbar("Address updated!")
+            }
         }
-
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(TRANSPARENT))
         return view
     }
 
+    private fun atLeastOneInputIsEmpty():Boolean{
+        return (binding.addressCity.text.isNullOrBlank() ||
+                binding.addressPostCode.text.isNullOrBlank() ||
+                binding.addressStreet.text.isNullOrBlank())
+    }
 
     private fun setFields(street: String, postCode : String, city :String){
         if(street.isNullOrEmpty()) binding.addressStreet.setText("") else binding.addressStreet.setText(street)
