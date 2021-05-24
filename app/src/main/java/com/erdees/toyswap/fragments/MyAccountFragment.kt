@@ -2,6 +2,7 @@ package com.erdees.toyswap.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,8 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.erdees.toyswap.Constants
+import com.erdees.toyswap.Utils.makeGone
+import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.activities.MainActivity
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
 import com.erdees.toyswap.fragments.dialogs.ChangeAddressDialog
@@ -45,16 +48,17 @@ class MyAccountFragment : Fragment(),DialogListener {
         user = auth.currentUser!!
         userDocRef = db.collection("users").document(user.uid)
 
+        setUserNameAndMail()
         binding.profilePic.setAvatar()
         setAddressAccordingly()
-
+        setButtonsAccordingly()
 
         binding.changeAddressBtn.setOnClickListener {
-            val changeAddressDialog = ChangeAddressDialog(requireContext(),this)
+            val changeAddressDialog = ChangeAddressDialog(this)
             changeAddressDialog.show(childFragmentManager, ChangeAddressDialog.TAG)
         }
 
-        binding.logoutButton.setOnClickListener {
+        binding.logoutBtn.setOnClickListener {
             auth.signOut()
             restartActivity()
         }
@@ -72,6 +76,22 @@ class MyAccountFragment : Fragment(),DialogListener {
         startActivity(mainActivity)
     }
 
+    private fun setButtonsAccordingly(){
+       if(user.getIdToken(false).result?.signInProvider == "google.com") binding.changePasswordBtn.makeGone()
+       else binding.changePasswordBtn.makeVisible()
+    }
+
+    private fun setUserNameAndMail(){
+        userDocRef.get().addOnSuccessListener {
+            val userName = it["name"].toString()
+            val userMail = it["emailAddress"].toString()
+            if(!userName.isNullOrBlank())binding.accountFullNameTV.text = userName
+            else binding.accountFullNameTV.text = ""
+
+            binding.accountEmailTV.text = userMail
+        }
+    }
+
     private fun ImageView.setAvatar(){
     userDocRef.get().addOnSuccessListener {
         val thisUserProfilePictureUrl =  it["avatar"]
@@ -81,7 +101,7 @@ class MyAccountFragment : Fragment(),DialogListener {
                 .centerCrop()
                 .into(this)
 
-            binding.profilePicButton.text = "Change Picture"
+            binding.changePictureBtn.text = "Change Picture"
         }
         else this.setAnonProfilePicture()
     }
@@ -95,15 +115,24 @@ class MyAccountFragment : Fragment(),DialogListener {
             val street = (it["addressStreet"].toString())
             val postCode = (it["addressPostCode"].toString())
             val city = (it["addressCity"].toString())
-            if(street.isNullOrEmpty() && postCode.isNullOrEmpty() && city.isNullOrEmpty()) binding.addressTV.text = "You have not provided address."
+            Log.i(TAG," $street    ,    $postCode,    $city")
+            if(street.isNullOrEmpty() && postCode.isNullOrEmpty() && city.isNullOrEmpty()) setEmptyFields()
             else setFields(street,postCode,city)
         }
+    }
+
+    private fun setEmptyFields(){
+        binding.addressTV.text = "You have not provided address."
+        binding.addressPostCodeTV.makeGone()
+        binding.addressCityTV.makeGone()
     }
 
     private fun setFields(street: String, postCode: String, city: String){
         binding.addressTV.text = street
         binding.addressPostCodeTV.text = postCode
         binding.addressCityTV.text = city
+        binding.addressPostCodeTV.makeVisible()
+        binding.addressCityTV.makeVisible()
     }
 
     private fun ImageView.setAnonProfilePicture(){
@@ -112,7 +141,7 @@ class MyAccountFragment : Fragment(),DialogListener {
             .centerCrop()
             .into(this)
 
-        binding.profilePicButton.text = "Add Picture"
+        binding.changePictureBtn.text = "Add Picture"
     }
 
 
