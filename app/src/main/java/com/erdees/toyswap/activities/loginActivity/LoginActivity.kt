@@ -140,7 +140,7 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    fun signInWithMail() {
+    private fun signInWithMail() {
         auth.signInWithEmailAndPassword(binding.emailInput.text.toString(), binding.passwordInput.text.toString())
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
