@@ -66,6 +66,7 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
         }
 
         binding.changePasswordBtn.setOnClickListener {
+            //TODO REFACTOR LOGIC INSIDE THIS DIALOG AND ANOTHER ONE!!!
             openDialogToReAuthenticate()
         }
 

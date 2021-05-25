@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.fragment.app.DialogFragment
 import com.erdees.toyswap.Utils.makeSnackbar
 import com.erdees.toyswap.Utils.makeToast
@@ -14,6 +15,7 @@ import com.erdees.toyswap.databinding.DialogChangeAddressBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -26,6 +28,8 @@ class ChangeAddressDialog(private val listener: MyAccountDialogsListener) : Dial
     private lateinit var auth: FirebaseAuth
     private lateinit var db : FirebaseFirestore
     private lateinit var user : FirebaseUser
+    private lateinit var userDocRef : DocumentReference
+    private lateinit var view : LinearLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,13 +37,13 @@ class ChangeAddressDialog(private val listener: MyAccountDialogsListener) : Dial
         savedInstanceState: Bundle?
     ): View {
         _binding = DialogChangeAddressBinding.inflate(inflater,container,false)
-        val view = binding.root
+        view = binding.root
 
         auth = Firebase.auth
         db = Firebase.firestore
         user = auth.currentUser!! // not nullable cause This dialog can't be opened unless somebody is logged in.
 
-        val userDocRef = db.collection("users").document(user.uid)
+        userDocRef = db.collection("users").document(user.uid)
 
             userDocRef.get().addOnSuccessListener {
                 val street = (it["addressStreet"].toString())
@@ -49,20 +53,24 @@ class ChangeAddressDialog(private val listener: MyAccountDialogsListener) : Dial
             }
 
         binding.addressSubmitBtn.setOnClickListener {
-            if (atLeastOneInputIsEmpty()) view.makeToast("Fill every field.")
-            else {
-                userDocRef.update(
-                    "addressStreet", binding.addressStreet.text.toString(),
-                    "addressPostCode", binding.addressPostCode.text.toString(),
-                    "addressCity", binding.addressCity.text.toString()
-                )
-                this.dismiss()
-                parentFragment?.view?.makeSnackbar("Address updated!")
-            }
+            updateAddress()
         }
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(TRANSPARENT))
         return view
+    }
+
+    private fun updateAddress(){
+        if (atLeastOneInputIsEmpty()) view.makeToast("Fill every field.")
+        else {
+            userDocRef.update(
+                "addressStreet", binding.addressStreet.text.toString(),
+                "addressPostCode", binding.addressPostCode.text.toString(),
+                "addressCity", binding.addressCity.text.toString()
+            )
+            this.dismiss()
+            parentFragment?.view?.makeSnackbar("Address updated!")
+        }
     }
 
     private fun atLeastOneInputIsEmpty():Boolean{

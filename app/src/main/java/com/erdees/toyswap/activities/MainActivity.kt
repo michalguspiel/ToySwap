@@ -14,8 +14,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-/**TODO ADD MAIN LOGIC 
- * TODO FRAGMENTS: MY ACC, BROWSE ITEMS,MESSAGES,*/
 
 class MainActivity : AppCompatActivity() {
 

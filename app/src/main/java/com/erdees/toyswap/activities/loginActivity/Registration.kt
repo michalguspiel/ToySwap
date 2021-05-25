@@ -37,5 +37,4 @@ class Registration(val password: String, private val confirmPassword: String, va
         passwordIsOnlyDigits(password) -> "Password can't contain digits only!"
         else -> "No error"
     }
-
 }
