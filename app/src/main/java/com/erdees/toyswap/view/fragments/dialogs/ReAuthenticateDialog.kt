@@ -1,4 +1,4 @@
-package com.erdees.toyswap.fragments.dialogs
+package com.erdees.toyswap.view.fragments.dialogs
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -75,6 +75,11 @@ class ReAuthenticateDialog(override var passwordChangedSuccessfully: Boolean?) :
 
     override fun onCloseDialog() {
         this.dismiss()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }
