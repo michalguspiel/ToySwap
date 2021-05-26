@@ -7,7 +7,7 @@ import com.erdees.toyswap.model.repositories.AuthRepository
 
 class LoginActivityViewModel(application: Application): AndroidViewModel(application) {
 
-    private val authRepository : AuthRepository = AuthRepository(application)
+    private val authRepository : AuthRepository = AuthRepository.getInstance(application)
 
     val userLiveData = authRepository.getUserLiveData()
 

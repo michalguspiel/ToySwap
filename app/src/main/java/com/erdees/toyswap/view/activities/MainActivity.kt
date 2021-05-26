@@ -3,15 +3,15 @@ package com.erdees.toyswap.view.activities
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
 import com.erdees.toyswap.databinding.ActivityMainBinding
 import com.erdees.toyswap.view.fragments.AddItemFragment
 import com.erdees.toyswap.view.fragments.MainFragment
 import com.erdees.toyswap.view.fragments.MyAccountFragment
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.erdees.toyswap.viewModel.MainActivityViewModel
+import com.google.firebase.auth.FirebaseUser
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,16 +21,27 @@ class MainActivity : AppCompatActivity() {
     private val myAccountFragment = MyAccountFragment.newInstance()
     private val addFragment = AddItemFragment.newInstance()
 
-    lateinit var auth: FirebaseAuth
-
+    private lateinit var viewModel : MainActivityViewModel
     private lateinit var viewBinding: ActivityMainBinding
+
+    private var currentUser: FirebaseUser? = null
+    private var isUserLoggedIn : Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        auth = Firebase.auth
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         val view = viewBinding.root
+        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         setContentView(view)
+
+        viewModel.userLiveData.observe(this,  {
+            currentUser = it
+        })
+
+        viewModel.isUserLoggedIn.observe(this,{
+            isUserLoggedIn = it
+        })
 
         viewBinding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId){
@@ -43,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.nav_myAccountFragment -> {
-                    if(auth.currentUser != null)Utils.openFragment(myAccountFragment,MyAccountFragment.TAG,supportFragmentManager)
+                    if(isUserLoggedIn)Utils.openFragment(myAccountFragment,MyAccountFragment.TAG,supportFragmentManager)
                     else openLoginActivity()
                 }
                 else -> {}
