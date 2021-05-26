@@ -17,7 +17,6 @@ import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
 import com.erdees.toyswap.view.activities.MainActivity
 import com.erdees.toyswap.view.fragments.dialogs.ChangeAddressDialog
-import com.erdees.toyswap.view.fragments.dialogs.MyAccountDialogsListener
 import com.erdees.toyswap.view.fragments.dialogs.ReAuthenticateDialog
 import com.erdees.toyswap.viewModel.MyAccountFragmentViewModel
 import com.google.firebase.auth.FirebaseUser
@@ -27,7 +26,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 
-class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fragment(),MyAccountDialogsListener {
+class MyAccountFragment : Fragment() {
 
     private var _binding: FragmentMyAccountBinding? = null
     private val binding get() = _binding!!
@@ -53,8 +52,14 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
                 userDocRef = db.collection("users").document(user.uid)
                 setUserNameAndMail()
                 binding.profilePic.setAvatar()
-                setAddressAccordingly()
                 setButtonsAccordingly()
+            }
+        })
+
+        viewModel.addressLiveData.observe(viewLifecycleOwner,{ address ->
+            with (address){
+                if(street.isEmpty() && postCode.isEmpty() && city.isEmpty()) setEmptyFields()
+                else setFields(street,postCode,city)
             }
         })
 
@@ -64,7 +69,7 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
 
 
         binding.changeAddressBtn.setOnClickListener {
-            val changeAddressDialog = ChangeAddressDialog(this)
+            val changeAddressDialog = ChangeAddressDialog()
             changeAddressDialog.show(childFragmentManager, ChangeAddressDialog.TAG)
         }
 
@@ -80,7 +85,7 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
     }
 
     companion object {
-        fun newInstance(): MyAccountFragment = MyAccountFragment(null)
+        fun newInstance(): MyAccountFragment = MyAccountFragment()
         const val TAG = "MyAccountFragment"
     }
 
@@ -131,17 +136,6 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
         }
     }
 
-    private fun setAddressAccordingly(){
-        userDocRef.get().addOnSuccessListener {
-            val street = (it["addressStreet"].toString())
-            val postCode = (it["addressPostCode"].toString())
-            val city = (it["addressCity"].toString())
-            Log.i(TAG," $street    ,    $postCode,    $city")
-            if(street.isEmpty() && postCode.isEmpty() && city.isEmpty()) setEmptyFields()
-            else setFields(street,postCode,city)
-        }
-    }
-
     @SuppressLint("SetTextI18n")
     private fun setEmptyFields(){
         binding.addressTV.text = "You have not provided address."
@@ -172,10 +166,6 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onCloseDialog() {
-        setAddressAccordingly()
     }
 
 }

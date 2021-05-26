@@ -18,6 +18,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
+
+//TODO FIX BUG HERE PROBABLY
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: LoginActivityBinding
