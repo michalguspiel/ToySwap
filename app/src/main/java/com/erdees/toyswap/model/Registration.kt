@@ -1,4 +1,4 @@
-package com.erdees.toyswap.activities.loginActivity
+package com.erdees.toyswap.model
 
 import com.erdees.toyswap.Utils.isEmailValid
 

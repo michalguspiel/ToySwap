@@ -1,15 +1,14 @@
-package com.erdees.toyswap.activities
+package com.erdees.toyswap.view.activities
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
-import com.erdees.toyswap.activities.loginActivity.LoginActivity
 import com.erdees.toyswap.databinding.ActivityMainBinding
-import com.erdees.toyswap.fragments.AddItemFragment
-import com.erdees.toyswap.fragments.MainFragment
-import com.erdees.toyswap.fragments.MyAccountFragment
+import com.erdees.toyswap.view.fragments.AddItemFragment
+import com.erdees.toyswap.view.fragments.MainFragment
+import com.erdees.toyswap.view.fragments.MyAccountFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -56,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openLoginActivity(){
-        val loginActivity = Intent(this,LoginActivity::class.java)
+        val loginActivity = Intent(this, LoginActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(loginActivity)
     }

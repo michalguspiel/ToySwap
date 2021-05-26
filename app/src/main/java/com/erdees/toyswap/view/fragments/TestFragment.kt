@@ -1,4 +1,4 @@
-package com.erdees.toyswap.fragments
+package com.erdees.toyswap.view.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater

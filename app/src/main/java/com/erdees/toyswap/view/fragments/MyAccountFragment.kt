@@ -1,4 +1,4 @@
-package com.erdees.toyswap.fragments
+package com.erdees.toyswap.view.fragments
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -9,18 +9,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.erdees.toyswap.Constants
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeVisible
-import com.erdees.toyswap.activities.MainActivity
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
-import com.erdees.toyswap.fragments.dialogs.ChangeAddressDialog
-import com.erdees.toyswap.fragments.dialogs.MyAccountDialogsListener
-import com.erdees.toyswap.fragments.dialogs.ReAuthenticateDialog
-import com.google.firebase.auth.FirebaseAuth
+import com.erdees.toyswap.view.activities.MainActivity
+import com.erdees.toyswap.view.fragments.dialogs.ChangeAddressDialog
+import com.erdees.toyswap.view.fragments.dialogs.MyAccountDialogsListener
+import com.erdees.toyswap.view.fragments.dialogs.ReAuthenticateDialog
+import com.erdees.toyswap.viewModel.MyAccountFragmentViewModel
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -32,10 +32,10 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
     private var _binding: FragmentMyAccountBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var auth: FirebaseAuth
     private lateinit var db : FirebaseFirestore
     private  lateinit var user : FirebaseUser
     private lateinit var userDocRef : DocumentReference
+    private lateinit var viewModel : MyAccountFragmentViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,16 +44,24 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
         // Inflate the layout for this fragment
         _binding = FragmentMyAccountBinding.inflate(inflater, container, false)
         val view = binding.root
-
-        auth = Firebase.auth
+        viewModel = ViewModelProvider(this).get(MyAccountFragmentViewModel::class.java)
         db  = Firebase.firestore
-        user = auth.currentUser!!
-        userDocRef = db.collection("users").document(user.uid)
 
-        setUserNameAndMail()
-        binding.profilePic.setAvatar()
-        setAddressAccordingly()
-        setButtonsAccordingly()
+        viewModel.userLiveData.observe(viewLifecycleOwner,{
+            if(it != null) {
+                user = it
+                userDocRef = db.collection("users").document(user.uid)
+                setUserNameAndMail()
+                binding.profilePic.setAvatar()
+                setAddressAccordingly()
+                setButtonsAccordingly()
+            }
+        })
+
+        viewModel.isUserLoggedOutLiveData.observe(viewLifecycleOwner,{
+            if(it) restartActivity()
+        })
+
 
         binding.changeAddressBtn.setOnClickListener {
             val changeAddressDialog = ChangeAddressDialog(this)
@@ -61,12 +69,10 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
         }
 
         binding.logoutBtn.setOnClickListener {
-            auth.signOut()
-            restartActivity()
+            viewModel.signOut()
         }
 
         binding.changePasswordBtn.setOnClickListener {
-            //TODO REFACTOR LOGIC INSIDE THIS DIALOG AND ANOTHER ONE!!!
             openDialogToReAuthenticate()
         }
 
@@ -89,9 +95,10 @@ class MyAccountFragment(override var passwordChangedSuccessfully: Boolean?) : Fr
     }
 
     private fun setButtonsAccordingly(){
-    //    Log.i(TAG, user.getIdToken(false).result.toString())
-       if(user.getIdToken(false).result?.signInProvider == "google.com") binding.changePasswordBtn.makeGone()
-       else binding.changePasswordBtn.makeVisible()
+        user.getIdToken(false).addOnSuccessListener { result ->
+            if(result.signInProvider == "google.com")binding.changePasswordBtn.makeGone()
+            else binding.changePasswordBtn.makeVisible()
+        }
     }
 
     private fun setUserNameAndMail(){

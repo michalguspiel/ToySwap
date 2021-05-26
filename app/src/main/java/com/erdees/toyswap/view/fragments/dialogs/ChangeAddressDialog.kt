@@ -1,4 +1,4 @@
-package com.erdees.toyswap.fragments.dialogs
+package com.erdees.toyswap.view.fragments.dialogs
 
 import android.content.DialogInterface
 import android.graphics.Color.TRANSPARENT
@@ -80,14 +80,19 @@ class ChangeAddressDialog(private val listener: MyAccountDialogsListener) : Dial
     }
 
     private fun setFields(street: String, postCode : String, city :String){
-        if(street.isNullOrEmpty()) binding.addressStreet.setText("") else binding.addressStreet.setText(street)
-        if(postCode.isNullOrEmpty()) binding.addressPostCode.setText("") else binding.addressPostCode.setText(postCode)
-        if(city.isNullOrEmpty()) binding.addressCity.setText("") else binding.addressCity.setText(city)
+        if(street.isEmpty()) binding.addressStreet.setText("") else binding.addressStreet.setText(street)
+        if(postCode.isEmpty()) binding.addressPostCode.setText("") else binding.addressPostCode.setText(postCode)
+        if(city.isEmpty()) binding.addressCity.setText("") else binding.addressCity.setText(city)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         listener.onCloseDialog()
         super.onDismiss(dialog)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

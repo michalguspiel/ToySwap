@@ -1,15 +1,16 @@
-package com.erdees.toyswap.fragments
+package com.erdees.toyswap.view.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.erdees.toyswap.databinding.FragmentAddItemBinding
+import com.erdees.toyswap.databinding.FragmentMainBinding
 
-class AddItemFragment : Fragment() {
 
-    private var _binding : FragmentAddItemBinding? = null
+class MainFragment : Fragment(){
+
+    private var _binding : FragmentMainBinding? = null
     private val binding get() = _binding!!
 
 
@@ -17,7 +18,7 @@ class AddItemFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAddItemBinding.inflate(inflater,container,false)
+        _binding = FragmentMainBinding.inflate(inflater,container,false)
         val view = binding.root
 
 
@@ -26,12 +27,15 @@ class AddItemFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(): AddItemFragment = AddItemFragment()
-        const val TAG = "AddItemFragment"
+        fun newInstance(): MainFragment = MainFragment()
+        const val TAG = "MainFragment"
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+
+
 }
