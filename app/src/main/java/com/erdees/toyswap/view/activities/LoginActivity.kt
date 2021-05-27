@@ -19,7 +19,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 
-//TODO FIX BUG HERE PROBABLY
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: LoginActivityBinding
@@ -51,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
             if (user != null) openMainActivity()
         })
         viewModel.isUserLoggedInLiveData.observe(this, { isUserLoggedOut ->
-            if (isUserLoggedOut) openMainActivity()
+            if (!isUserLoggedOut) openMainActivity()
         })
 
 

@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model.repositories
+package com.erdees.toyswap.model.firebase
 
 import android.app.Application
 import android.util.Log
@@ -9,6 +9,7 @@ import com.erdees.toyswap.model.Address
 import com.erdees.toyswap.model.Registration
 import com.erdees.toyswap.view.activities.LoginActivity
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -16,36 +17,52 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class AuthRepository(private val application: Application) {
+class AuthDao(private val application: Application) {
 
     private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-
-    private val userLiveData: MutableLiveData<FirebaseUser?> = MutableLiveData<FirebaseUser?>()
+    private val firebaseUserLiveData: MutableLiveData<FirebaseUser?> = MutableLiveData<FirebaseUser?>()
     private val isUserLoggedOutLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     private val userAddressLiveData: MutableLiveData<Address> = MutableLiveData<Address>()
     private val docRefLiveData: MutableLiveData<DocumentReference> = MutableLiveData<DocumentReference>()
+
+    private val clientUserLiveData: MutableLiveData<User> = MutableLiveData<User>()
 
     init {
         updateUserLiveData()
     }
 
-    fun updateUserLiveData() {
+    private fun saveFirebaseUserAsClientUser(){
+        docRefLiveData.value?.get()?.addOnSuccessListener {
+            val name : String = it["name"].toString()
+            val email : String= it["emailAddress"].toString()
+            val points: Long = it["points"].toString().toLong()
+            val avatar: String = it["avatar"].toString()
+            val addressCity: String = it["addressCity"].toString()
+            val addressPostCode : String = it["addressPostCode"].toString()
+            val addressStreet: String = it["addressStreet"].toString()
+
+            val thisSessionUser = User(name,email,points,avatar,addressCity,addressPostCode,addressStreet)
+            clientUserLiveData.postValue(thisSessionUser)
+        }
+    }
+
+    private fun updateUserLiveData() {
         Log.i("TEST", " THIS THING IS CALLED DOES IT RUIN IT?")
         if (firebaseAuth.currentUser != null) {
-            userLiveData.postValue(firebaseAuth.currentUser)
+            firebaseUserLiveData.postValue(firebaseAuth.currentUser)
             isUserLoggedOutLiveData.postValue(false)
             val docRef =  Firebase.firestore.collection("users").document(firebaseAuth.currentUser!!.uid)
             docRefLiveData.postValue(docRef)
             getAddress(docRef)
-
+            saveFirebaseUserAsClientUser()
         } else{
             isUserLoggedOutLiveData.postValue(true)
-            userLiveData.value = null
+            firebaseUserLiveData.value = null
         }
     }
 
     fun getUserLiveData(): MutableLiveData<FirebaseUser?> {
-        return userLiveData
+        return firebaseUserLiveData
     }
 
     fun getIsUserLoggedOutLiveData(): MutableLiveData<Boolean> {
@@ -142,25 +159,28 @@ class AuthRepository(private val application: Application) {
     }
 
     private fun setUserAddress(address: Address) {
-        Log.i("TEST!!!","ADDRESS UPDATEED FOR ! ::: $address")
         userAddressLiveData.value = address
-        Log.i("TEST!!!","ADDRESS UPDATEED FOR ! ::: ${userAddressLiveData.value}")
-
     }
 
     fun getUserAddressLiveData(): MutableLiveData<Address> {
-       return userAddressLiveData
+        return userAddressLiveData
     }
 
-
-    /**Singleton object */
-    companion object {
-        @Volatile private var instance: AuthRepository? = null
-        fun getInstance(application: Application) =
-            instance ?: synchronized(this) {
-                instance
-                    ?: AuthRepository(application).also { instance = it }
-            }
+    fun reAuthenticate(cred: AuthCredential): Task<Void>?{
+        return firebaseAuth.currentUser?.reauthenticate(cred)
     }
 
+    fun changePassword(registration: Registration) : Task<Void>?{
+       return firebaseAuth.currentUser?.updatePassword(registration.password)
+    }
+
+    /**SINGLETON*/
+    companion object{
+    @Volatile private var instance: AuthDao? = null
+    fun getInstance(application: Application) =
+        instance ?: synchronized(this) {
+            instance
+                ?: AuthDao(application).also { instance = it }
+        }
+}
 }

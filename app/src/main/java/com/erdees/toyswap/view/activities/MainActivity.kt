@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
 
     private var currentUser: FirebaseUser? = null
-    private var isUserLoggedIn : Boolean = false
+    private var isUserLoggedOut : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,8 +39,8 @@ class MainActivity : AppCompatActivity() {
             currentUser = it
         })
 
-        viewModel.isUserLoggedIn.observe(this,{
-            isUserLoggedIn = it
+        viewModel.isUserLoggedOut.observe(this,{
+            isUserLoggedOut = it
         })
 
         viewBinding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.nav_myAccountFragment -> {
-                    if(isUserLoggedIn)Utils.openFragment(myAccountFragment,MyAccountFragment.TAG,supportFragmentManager)
+                    if(!isUserLoggedOut)Utils.openFragment(myAccountFragment,MyAccountFragment.TAG,supportFragmentManager)
                     else openLoginActivity()
                 }
                 else -> {}

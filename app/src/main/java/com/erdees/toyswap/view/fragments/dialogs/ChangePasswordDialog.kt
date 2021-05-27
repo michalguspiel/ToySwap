@@ -7,25 +7,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.Utils.makeToast
-import com.erdees.toyswap.model.Registration
 import com.erdees.toyswap.databinding.DialogChangePasswordBinding
-import com.google.firebase.auth.FirebaseAuth
+import com.erdees.toyswap.model.Registration
+import com.erdees.toyswap.viewModel.ChangePasswordDialogViewModel
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 
 class ChangePasswordDialog(private val listener: MyAccountDialogsListener) : DialogFragment() {
 
     private var _binding: DialogChangePasswordBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+
     private lateinit var user: FirebaseUser
+    private lateinit var viewModel: ChangePasswordDialogViewModel
+    private lateinit var view : LinearLayout
+    private val progressBar by lazy{
+        ProgressBar(requireContext())
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,27 +37,34 @@ class ChangePasswordDialog(private val listener: MyAccountDialogsListener) : Dia
         savedInstanceState: Bundle?
     ): View {
         _binding = DialogChangePasswordBinding.inflate(inflater, container, false)
-        val view = binding.root
+        view = binding.root
+        viewModel = ViewModelProvider(this).get(ChangePasswordDialogViewModel::class.java)
 
-        auth = Firebase.auth
-        db = Firebase.firestore
-        user = auth.currentUser!! // not nullable cause This dialog can't be opened unless somebody is logged in.
-
+        viewModel.userLiveData.observe(viewLifecycleOwner,{
+            if (it != null) {
+                user = it
+            }
+        })
 
         binding.changePasswordSubmitBtn.setOnClickListener {
+            showLoading()
             val registration = Registration(
                 binding.passwordInput1.text.toString(),
                 binding.passwordInput2.text.toString(),
                 user.email.toString()
             )
             if (!registration.isLegit()) {
-                listener.passwordChangedSuccessfully = false
-                view.makeToast(registration.errorMessage)
-
-            } else {
-                user.updatePassword(binding.passwordInput1.text.toString())
-                listener.passwordChangedSuccessfully = true
-                this.dismiss()
+                passwordChangeError(registration.errorMessage)
+            }
+            else {
+                viewModel.changePassword(registration)?.addOnSuccessListener {
+                    listener.passwordChangedSuccessfully = true
+                    this.dismiss()
+                    endLoading()
+                }
+                    ?.addOnFailureListener {
+                        passwordChangeError(registration.errorMessage)
+                    }
             }
         }
 
@@ -61,8 +72,22 @@ class ChangePasswordDialog(private val listener: MyAccountDialogsListener) : Dia
         return view
     }
 
+    private fun showLoading(){
+        view.addView(progressBar)
+    }
+
+    private fun endLoading(){
+        view.removeView(progressBar)
+    }
+
     companion object {
         const val TAG = "ChangePasswordDialog"
+    }
+
+    private fun passwordChangeError(message: String){
+        listener.passwordChangedSuccessfully = false
+        view.makeToast(message)
+        endLoading()
     }
 
     override fun onDismiss(dialog: DialogInterface) {
