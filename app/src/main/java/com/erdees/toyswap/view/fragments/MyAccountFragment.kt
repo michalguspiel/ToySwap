@@ -11,6 +11,8 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.signature.ObjectKey
 import com.erdees.toyswap.Constants
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeVisible
@@ -99,7 +101,7 @@ class MyAccountFragment : Fragment() {
         startActivity(mainActivity)
     }
 
-    private fun setButtonsAccordingly(){
+    private fun setButtonsAccordingly(){  // TODO THIS NEEDS TO BE STORED SOMEWHERE LOCALLY SO IT WORKS SMOOTHER PROBABLY WITH USER LIVE DATA .
         user.getIdToken(false).addOnSuccessListener { result ->
             if(result.signInProvider == "google.com")binding.changePasswordBtn.makeGone()
             else binding.changePasswordBtn.makeVisible()
@@ -121,10 +123,13 @@ class MyAccountFragment : Fragment() {
     private fun ImageView.setAvatar(){
     userDocRef.get().addOnSuccessListener {
         val thisUserProfilePictureUrl =  it["avatar"].toString()
+
         if(thisUserProfilePictureUrl.isNotBlank() && thisUserProfilePictureUrl != "null") {
             Glide.with(requireActivity())
                 .load(thisUserProfilePictureUrl)
                 .centerCrop()
+                .signature(ObjectKey(thisUserProfilePictureUrl))
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(this)
 
             binding.changePictureBtn.text = "Change Picture"
@@ -157,6 +162,8 @@ class MyAccountFragment : Fragment() {
         Glide.with(requireActivity())
             .load(Constants.NO_PROFILE_PICTURE_URL)
             .centerCrop()
+            .signature(ObjectKey(Constants.NO_PROFILE_PICTURE_URL))
+            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
             .into(this)
 
         binding.changePictureBtn.text = "Add Picture"

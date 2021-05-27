@@ -3,11 +3,18 @@ package com.erdees.toyswap.viewModel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.toyswap.model.Registration
-import com.erdees.toyswap.model.repositories.AuthRepository
+import com.erdees.toyswap.model.firebase.AuthDao
+import com.erdees.toyswap.model.firebase.AuthRepository
 
 class LoginActivityViewModel(application: Application): AndroidViewModel(application) {
 
-    private val authRepository : AuthRepository = AuthRepository.getInstance(application)
+    private val authRepository : AuthRepository
+
+    init {
+        val authDao = AuthDao.getInstance(application)
+        authRepository = AuthRepository(authDao)
+    }
+
 
     val userLiveData = authRepository.getUserLiveData()
 
@@ -25,7 +32,4 @@ class LoginActivityViewModel(application: Application): AndroidViewModel(applica
         authRepository.firebaseAuthWithGoogle(token)
     }
 
-    fun updateUserLiveData() {
-        authRepository.updateUserLiveData()
-    }
 }

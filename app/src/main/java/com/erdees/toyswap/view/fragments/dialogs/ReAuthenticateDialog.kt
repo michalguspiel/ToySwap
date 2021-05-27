@@ -8,25 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.Utils.makeSnackbar
 import com.erdees.toyswap.Utils.makeToast
 import com.erdees.toyswap.databinding.DialogReAuthenticateBinding
+import com.erdees.toyswap.viewModel.ReAuthViewModel
 import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 
 class ReAuthenticateDialog(override var passwordChangedSuccessfully: Boolean?) : DialogFragment(),MyAccountDialogsListener {
+
     private var _binding: DialogReAuthenticateBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var view : LinearLayout
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
-    private lateinit var user: FirebaseUser
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,16 +29,14 @@ class ReAuthenticateDialog(override var passwordChangedSuccessfully: Boolean?) :
         _binding = DialogReAuthenticateBinding.inflate(inflater,container,false)
 
         view = binding.root
-        auth = Firebase.auth
-        db = Firebase.firestore
-        user = auth.currentUser!! // not nullable cause This dialog can't be opened unless somebody is logged in.
 
+        val viewModel = ViewModelProvider(this).get(ReAuthViewModel::class.java)
 
         binding.reAuthenticateBtn.setOnClickListener {
             val cred = EmailAuthProvider.getCredential(binding.emailInput.text.toString(),binding.passwordInput.text.toString())
-            user.reauthenticate(cred).addOnCompleteListener { task ->
+            viewModel.reAuthenticate(cred)?.addOnCompleteListener{ task ->
                 if(task.isSuccessful) continueWithChangingPassword()
-                    else authenticationFailed()
+                else authenticationFailed()
             }
         }
 
@@ -60,7 +51,7 @@ class ReAuthenticateDialog(override var passwordChangedSuccessfully: Boolean?) :
     }
 
     private fun authenticationFailed(){
-        view.makeToast("Authentication failed!")
+        view.makeToast("Authentication failed! Wrong email or password.")
         binding.emailInput.text?.clear()
         binding.passwordInput.text?.clear()
     }
