@@ -2,10 +2,10 @@ package com.erdees.toyswap.view.fragments
 
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,10 +17,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.erdees.toyswap.Constants
-import com.erdees.toyswap.Utils.endLoading
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeVisible
-import com.erdees.toyswap.Utils.showLoading
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
 import com.erdees.toyswap.model.firebase.ClientUser
 import com.erdees.toyswap.view.activities.MainActivity
@@ -28,10 +26,8 @@ import com.erdees.toyswap.view.fragments.dialogs.ChangeAddressDialog
 import com.erdees.toyswap.view.fragments.dialogs.ReAuthenticateDialog
 import com.erdees.toyswap.viewModel.MyAccountFragmentViewModel
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.storage.FirebaseStorage
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
-import kotlin.random.Random
 
 
 class MyAccountFragment : Fragment() {
@@ -45,14 +41,9 @@ class MyAccountFragment : Fragment() {
     private lateinit var viewModel: MyAccountFragmentViewModel
     private lateinit var view: ScrollView
 
-    private lateinit var generatedId: String
+    private lateinit var alertDialog: AlertDialog
 
-    private val storage = FirebaseStorage.getInstance()
-    private val storageRef = storage.reference
-    private fun profilePicImageRef() = storageRef.child("profilePics/${user.uid}_profile_pic.jpg")
-    private val progressBar by lazy {
-        ProgressBar(requireContext())
-    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -213,7 +204,7 @@ class MyAccountFragment : Fragment() {
             val result = CropImage.getActivityResult(data)
             if (resultCode == RESULT_OK) {
                 val resultUri = result.uri
-                uploadImage(resultUri)
+                changeAvatar(resultUri)
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 result.error
             }
@@ -221,22 +212,29 @@ class MyAccountFragment : Fragment() {
         }
     }
 
-    private fun uploadImage(imageUri: Uri) {
-        binding.profilePicLayout.showLoading(progressBar)
-        randomizeNumber()
-        profilePicImageRef().delete().addOnCompleteListener {
-            profilePicImageRef().putFile(imageUri)
-                .addOnSuccessListener {
-                profilePicImageRef().downloadUrl.addOnSuccessListener { uri ->
-                    Log.i("TEST GOT IT? ", uri.toString())
-                    viewModel.updateAvatar(uri.toString())
-                        ?.addOnSuccessListener { binding.profilePicLayout.endLoading(progressBar) }
+    private fun changeAvatar(imageUri: Uri){
+        showLoading()
+        viewModel.deleteCurrentAvatar().addOnCompleteListener {
+            viewModel.uploadNewAvatar(imageUri).addOnSuccessListener {
+                viewModel.getNewAvatarUrl().addOnSuccessListener {  newAvatarUrl ->
+                    viewModel.updateAvatar(newAvatarUrl.toString())?.addOnSuccessListener { endLoading() }
                 }
-                    .addOnFailureListener {
-                        Log.i("TEST", "fail")
-                    }
             }
         }
+    }
+
+
+
+    private fun showLoading(){
+         alertDialog = AlertDialog.Builder(requireContext())
+             .setView(ProgressBar(requireContext()))
+             .setMessage("Loading...")
+             .show()
+
+    }
+
+    private fun endLoading(){
+        alertDialog.dismiss()
     }
 
     private fun openGalleryForImage() {
@@ -245,11 +243,6 @@ class MyAccountFragment : Fragment() {
         startActivityForResult(intent, REQUEST_CODE)
     }
 
-    private fun randomizeNumber() {
-        val randomSeed = Random(System.currentTimeMillis())
-        val randomNumber = randomSeed.nextLong(9999999L, 999999999L)
-        generatedId = randomNumber.toString()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
