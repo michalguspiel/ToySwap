@@ -1,6 +1,6 @@
 package com.erdees.toyswap.model.firebase
 
-data class User(
+data class ClientUser(
     val name: String = "",
     val emailAddress: String = "",
     val points: Long = 0L,

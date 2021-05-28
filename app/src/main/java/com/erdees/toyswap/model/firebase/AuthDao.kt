@@ -20,45 +20,61 @@ import com.google.firebase.ktx.Firebase
 class AuthDao(private val application: Application) {
 
     private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firebaseUserLiveData: MutableLiveData<FirebaseUser?> = MutableLiveData<FirebaseUser?>()
+    private val firebaseUserLiveData: MutableLiveData<FirebaseUser?> =
+        MutableLiveData<FirebaseUser?>()
     private val isUserLoggedOutLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
     private val userAddressLiveData: MutableLiveData<Address> = MutableLiveData<Address>()
-    private val docRefLiveData: MutableLiveData<DocumentReference> = MutableLiveData<DocumentReference>()
+    private val docRefLiveData: MutableLiveData<DocumentReference> =
+        MutableLiveData<DocumentReference>()
 
-    private val clientUserLiveData: MutableLiveData<User> = MutableLiveData<User>()
+    private val clientUserLiveData: MutableLiveData<ClientUser?> = MutableLiveData<ClientUser?>()
+
+    private val userAuthProviderTokenLiveData : MutableLiveData<String> = MutableLiveData<String>()
 
     init {
         updateUserLiveData()
     }
 
-    private fun saveFirebaseUserAsClientUser(){
-        docRefLiveData.value?.get()?.addOnSuccessListener {
-            val name : String = it["name"].toString()
-            val email : String= it["emailAddress"].toString()
+    private fun saveFirebaseUserAsClientUser(docRef: DocumentReference) {
+        docRef.get().addOnSuccessListener {
+            val name: String = it["name"].toString()
+            val email: String = it["emailAddress"].toString()
             val points: Long = it["points"].toString().toLong()
             val avatar: String = it["avatar"].toString()
             val addressCity: String = it["addressCity"].toString()
-            val addressPostCode : String = it["addressPostCode"].toString()
+            val addressPostCode: String = it["addressPostCode"].toString()
             val addressStreet: String = it["addressStreet"].toString()
 
-            val thisSessionUser = User(name,email,points,avatar,addressCity,addressPostCode,addressStreet)
+            setUserAddress(Address(addressStreet, addressPostCode, addressCity))
+
+            val thisSessionUser =
+                ClientUser(name, email, points, avatar, addressCity, addressPostCode, addressStreet)
+            Log.i("TEST", "this session user saved ! $thisSessionUser")
             clientUserLiveData.postValue(thisSessionUser)
         }
     }
 
     private fun updateUserLiveData() {
+        val fireBaseUser = firebaseAuth.currentUser
         Log.i("TEST", " THIS THING IS CALLED DOES IT RUIN IT?")
-        if (firebaseAuth.currentUser != null) {
+        if (fireBaseUser != null) {
             firebaseUserLiveData.postValue(firebaseAuth.currentUser)
+            fireBaseUser.getIdToken(false).addOnSuccessListener { userAuthProviderTokenLiveData.postValue(it.signInProvider) }
             isUserLoggedOutLiveData.postValue(false)
-            val docRef =  Firebase.firestore.collection("users").document(firebaseAuth.currentUser!!.uid)
+            val docRef =
+                Firebase.firestore.collection("users").document(fireBaseUser.uid)
             docRefLiveData.postValue(docRef)
-            getAddress(docRef)
-            saveFirebaseUserAsClientUser()
-        } else{
+            saveFirebaseUserAsClientUser(docRef)
+        } else {
             isUserLoggedOutLiveData.postValue(true)
             firebaseUserLiveData.value = null
+            clientUserLiveData.value = null
         }
+    }
+
+
+    fun getClientUserLiveData(): MutableLiveData<ClientUser?> {
+        return clientUserLiveData
     }
 
     fun getUserLiveData(): MutableLiveData<FirebaseUser?> {
@@ -69,6 +85,9 @@ class AuthDao(private val application: Application) {
         return isUserLoggedOutLiveData
     }
 
+    fun getUserSignInProviderLiveData() :MutableLiveData<String>{
+        return userAuthProviderTokenLiveData
+    }
 
     fun registerWithPassword(registration: Registration) {
         if (!registration.isLegit()) {
@@ -137,7 +156,7 @@ class AuthDao(private val application: Application) {
         updateUserLiveData()
     }
 
-    fun updateAddress( address: Address): Task<Void>? {
+    fun updateAddress(address: Address): Task<Void>? {
         with(address) {
             setUserAddress(address)
             return docRefLiveData.value?.update(
@@ -148,39 +167,71 @@ class AuthDao(private val application: Application) {
         }
     }
 
-    private fun getAddress(docRef: DocumentReference){
-        docRef.get().addOnSuccessListener {
-            val street = (it["addressStreet"].toString())
-            val postCode = (it["addressPostCode"].toString())
-            val city = (it["addressCity"].toString())
-            val address = Address(street, postCode, city)
-            setUserAddress(address)
-        }
-    }
-
     private fun setUserAddress(address: Address) {
         userAddressLiveData.value = address
+
+        updateClientAddressLiveData(address)
     }
+
+    private fun updateClientAddressLiveData(address: Address) {
+        val thisClient = clientUserLiveData.value
+        if (thisClient != null) {
+            val updatedClient = ClientUser(
+                thisClient.name,
+                thisClient.emailAddress,
+                thisClient.points,
+                thisClient.avatar,
+                address.city,
+                address.postCode,
+                address.street
+            )
+        clientUserLiveData.postValue(updatedClient)
+        }
+    else Log.i("AuthDao","ERROR UPDATING CLIENT ADDRESS!")
+    }
+
+    private fun updateClientAvatar(uri: String) {
+        val thisClient = clientUserLiveData.value
+        if (thisClient != null) {
+            val updatedClient = ClientUser(
+                thisClient.name,
+                thisClient.emailAddress,
+                thisClient.points,
+                uri,
+                thisClient.addressCity,
+                thisClient.addressPostCode,
+                thisClient.addressStreet
+            )
+            clientUserLiveData.postValue(updatedClient)
+        }
+        else Log.i("AuthDao","ERROR UPDATING CLIENT AVATAR!")
+    }
+
+    fun updateFirebaseUserAvatar(uri: String): Task<Void>?{
+        return docRefLiveData.value?.update("avatar",uri)?.addOnSuccessListener { updateClientAvatar(uri)}
+        }
+
 
     fun getUserAddressLiveData(): MutableLiveData<Address> {
         return userAddressLiveData
     }
 
-    fun reAuthenticate(cred: AuthCredential): Task<Void>?{
+    fun reAuthenticate(cred: AuthCredential): Task<Void>? {
         return firebaseAuth.currentUser?.reauthenticate(cred)
     }
 
-    fun changePassword(registration: Registration) : Task<Void>?{
-       return firebaseAuth.currentUser?.updatePassword(registration.password)
+    fun changePassword(registration: Registration): Task<Void>? {
+        return firebaseAuth.currentUser?.updatePassword(registration.password)
     }
 
     /**SINGLETON*/
-    companion object{
-    @Volatile private var instance: AuthDao? = null
-    fun getInstance(application: Application) =
-        instance ?: synchronized(this) {
-            instance
-                ?: AuthDao(application).also { instance = it }
-        }
-}
+    companion object {
+        @Volatile
+        private var instance: AuthDao? = null
+        fun getInstance(application: Application) =
+            instance ?: synchronized(this) {
+                instance
+                    ?: AuthDao(application).also { instance = it }
+            }
+    }
 }

@@ -57,6 +57,10 @@ class MainActivity : AppCompatActivity() {
                     if(!isUserLoggedOut)Utils.openFragment(myAccountFragment,MyAccountFragment.TAG,supportFragmentManager)
                     else openLoginActivity()
                 }
+                R.id.nav_messagesFragment -> {
+                  // TODO   if(!isUserLoggedOut)Utils.openFragment(chatFragment,ChatFragment.TAG,supportFragmentManager)
+                    //else TODO openLoginActivity()
+                }
                 else -> {}
             }
             true
