@@ -1,6 +1,7 @@
 package com.erdees.toyswap.model.firebase
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -16,6 +17,8 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 
 class AuthDao(private val application: Application) {
 
@@ -30,6 +33,11 @@ class AuthDao(private val application: Application) {
     private val clientUserLiveData: MutableLiveData<ClientUser?> = MutableLiveData<ClientUser?>()
 
     private val userAuthProviderTokenLiveData : MutableLiveData<String> = MutableLiveData<String>()
+
+    private val storage = FirebaseStorage.getInstance()
+    private val storageRef = storage.reference
+
+    fun profilePicImageRef() = storageRef.child("profilePics/${firebaseAuth.currentUser?.uid}_profile_pic.jpg")
 
     init {
         updateUserLiveData()
@@ -223,6 +231,21 @@ class AuthDao(private val application: Application) {
     fun changePassword(registration: Registration): Task<Void>? {
         return firebaseAuth.currentUser?.updatePassword(registration.password)
     }
+
+    fun deleteCurrentAvatar(): Task<Void> {
+        return profilePicImageRef().delete()
+    }
+
+    fun uploadNewAvatar(imageUri: Uri) : UploadTask{
+     return  profilePicImageRef().putFile(imageUri)
+    }
+
+    fun getNewAvatarUrl() : Task<Uri> {
+       return profilePicImageRef().downloadUrl
+    }
+
+
+    
 
     /**SINGLETON*/
     companion object {
