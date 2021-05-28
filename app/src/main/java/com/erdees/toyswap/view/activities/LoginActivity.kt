@@ -46,13 +46,9 @@ class LoginActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(LoginActivityViewModel::class.java)
 
 
-        viewModel.userLiveData.observe(this, { user ->
-            if (user != null) openMainActivity()
-        })
         viewModel.isUserLoggedInLiveData.observe(this, { isUserLoggedOut ->
             if (!isUserLoggedOut) openMainActivity()
         })
-
 
         binding.signWithEmailBtn.setOnClickListener {
             viewModel.loginWithEmail(

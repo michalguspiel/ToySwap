@@ -2,6 +2,8 @@ package com.erdees.toyswap
 
 import android.text.TextUtils
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -48,5 +50,10 @@ object Utils {
         return !TextUtils.isEmpty(this) && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
     }
 
-
+    fun ViewGroup.showLoading(progressBar: ProgressBar) {
+        this.addView(progressBar)
+    }
+    fun ViewGroup.endLoading(progressBar: ProgressBar) {
+        this.removeView(progressBar)
+    }
 }

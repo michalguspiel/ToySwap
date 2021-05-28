@@ -13,6 +13,10 @@ class AuthRepository(private val authDao: AuthDao) {
         return authDao.getUserLiveData()
     }
 
+    fun getClientUserLiveData() : MutableLiveData<ClientUser?> {
+        return authDao.getClientUserLiveData()
+    }
+
     fun getIsUserLoggedOutLiveData(): MutableLiveData<Boolean> {
         return authDao.getIsUserLoggedOutLiveData()
     }
@@ -21,10 +25,17 @@ class AuthRepository(private val authDao: AuthDao) {
         return authDao.getUserAddressLiveData()
     }
 
+    fun getUserSignInProvider(): MutableLiveData<String>{
+        return authDao.getUserSignInProviderLiveData()
+    }
+
     fun updateAddress(address: Address): Task<Void>?{
        return authDao.updateAddress(address)
     }
 
+    fun updateAvatar(uri: String) : Task<Void>?{
+        return authDao.updateFirebaseUserAvatar(uri)
+    }
 
     fun registerWithPassword(registration: Registration){
         authDao.registerWithPassword(registration)

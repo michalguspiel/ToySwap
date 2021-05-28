@@ -11,7 +11,9 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import com.erdees.toyswap.Utils.endLoading
 import com.erdees.toyswap.Utils.makeToast
+import com.erdees.toyswap.Utils.showLoading
 import com.erdees.toyswap.databinding.DialogChangePasswordBinding
 import com.erdees.toyswap.model.Registration
 import com.erdees.toyswap.viewModel.ChangePasswordDialogViewModel
@@ -47,7 +49,7 @@ class ChangePasswordDialog(private val listener: MyAccountDialogsListener) : Dia
         })
 
         binding.changePasswordSubmitBtn.setOnClickListener {
-            showLoading()
+            view.showLoading(progressBar)
             val registration = Registration(
                 binding.passwordInput1.text.toString(),
                 binding.passwordInput2.text.toString(),
@@ -60,7 +62,7 @@ class ChangePasswordDialog(private val listener: MyAccountDialogsListener) : Dia
                 viewModel.changePassword(registration)?.addOnSuccessListener {
                     listener.passwordChangedSuccessfully = true
                     this.dismiss()
-                    endLoading()
+                    view.endLoading(progressBar)
                 }
                     ?.addOnFailureListener {
                         passwordChangeError(registration.errorMessage)
@@ -72,13 +74,6 @@ class ChangePasswordDialog(private val listener: MyAccountDialogsListener) : Dia
         return view
     }
 
-    private fun showLoading(){
-        view.addView(progressBar)
-    }
-
-    private fun endLoading(){
-        view.removeView(progressBar)
-    }
 
     companion object {
         const val TAG = "ChangePasswordDialog"
@@ -87,7 +82,7 @@ class ChangePasswordDialog(private val listener: MyAccountDialogsListener) : Dia
     private fun passwordChangeError(message: String){
         listener.passwordChangedSuccessfully = false
         view.makeToast(message)
-        endLoading()
+        view.endLoading(progressBar)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
