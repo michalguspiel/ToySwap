@@ -26,7 +26,6 @@ class AuthDao(private val application: Application) {
     private val firebaseUserLiveData: MutableLiveData<FirebaseUser?> =
         MutableLiveData<FirebaseUser?>()
     private val isUserLoggedOutLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-    private val userAddressLiveData: MutableLiveData<Address> = MutableLiveData<Address>()
     private val docRefLiveData: MutableLiveData<DocumentReference> =
         MutableLiveData<DocumentReference>()
 
@@ -37,7 +36,7 @@ class AuthDao(private val application: Application) {
     private val storage = FirebaseStorage.getInstance()
     private val storageRef = storage.reference
 
-    fun profilePicImageRef() = storageRef.child("profilePics/${firebaseAuth.currentUser?.uid}_profile_pic.jpg")
+    private fun profilePicImageRef() = storageRef.child("profilePics/${firebaseAuth.currentUser?.uid}_profile_pic.jpg")
 
     init {
         updateUserLiveData()
@@ -45,7 +44,8 @@ class AuthDao(private val application: Application) {
 
     private fun saveFirebaseUserAsClientUser(docRef: DocumentReference) {
         docRef.get().addOnSuccessListener {
-            val name: String = it["name"].toString()
+            val name: String = it["firstName"].toString()
+            val lastName : String = it["lastName"].toString()
             val email: String = it["emailAddress"].toString()
             val points: Long = it["points"].toString().toLong()
             val avatar: String = it["avatar"].toString()
@@ -56,7 +56,7 @@ class AuthDao(private val application: Application) {
             setUserAddress(Address(addressStreet, addressPostCode, addressCity))
 
             val thisSessionUser =
-                ClientUser(name, email, points, avatar, addressCity, addressPostCode, addressStreet)
+                ClientUser(name,lastName, email, points, avatar, addressCity, addressPostCode, addressStreet)
             Log.i("TEST", "this session user saved ! $thisSessionUser")
             clientUserLiveData.postValue(thisSessionUser)
         }
@@ -176,8 +176,6 @@ class AuthDao(private val application: Application) {
     }
 
     private fun setUserAddress(address: Address) {
-        userAddressLiveData.value = address
-
         updateClientAddressLiveData(address)
     }
 
@@ -185,7 +183,8 @@ class AuthDao(private val application: Application) {
         val thisClient = clientUserLiveData.value
         if (thisClient != null) {
             val updatedClient = ClientUser(
-                thisClient.name,
+                thisClient.firstName,
+                thisClient.lastName,
                 thisClient.emailAddress,
                 thisClient.points,
                 thisClient.avatar,
@@ -202,7 +201,8 @@ class AuthDao(private val application: Application) {
         val thisClient = clientUserLiveData.value
         if (thisClient != null) {
             val updatedClient = ClientUser(
-                thisClient.name,
+                thisClient.firstName,
+                thisClient.lastName,
                 thisClient.emailAddress,
                 thisClient.points,
                 uri,
@@ -219,10 +219,29 @@ class AuthDao(private val application: Application) {
         return docRefLiveData.value?.update("avatar",uri)?.addOnSuccessListener { updateClientAvatar(uri)}
         }
 
-
-    fun getUserAddressLiveData(): MutableLiveData<Address> {
-        return userAddressLiveData
+    fun updateClientName(firstName: String,lastName: String){
+        val thisClient = clientUserLiveData.value
+        if(thisClient != null){
+            val updatedClient = ClientUser(
+                firstName,
+                lastName,
+                thisClient.emailAddress,
+                thisClient.points,
+                thisClient.avatar,
+                thisClient.addressCity,
+                thisClient.addressPostCode,
+                thisClient.addressStreet
+            )
+            clientUserLiveData.postValue(updatedClient)
+        }
     }
+
+    fun updateNames(firstName: String,lastName: String): Task<Void>? {
+        return docRefLiveData.value?.update("firstName",firstName,"lastName",lastName)
+            ?.addOnSuccessListener { updateClientName(firstName,lastName) }
+
+    }
+
 
     fun reAuthenticate(cred: AuthCredential): Task<Void>? {
         return firebaseAuth.currentUser?.reauthenticate(cred)
@@ -245,7 +264,7 @@ class AuthDao(private val application: Application) {
     }
 
 
-    
+
 
     /**SINGLETON*/
     companion object {

@@ -45,8 +45,10 @@ class ChangeAddressDialog : DialogFragment() {
             if(firebaseUser != null) userDocRef = db.collection("users").document(user!!.uid)
         })
 
-        viewModel.userAddressLiveData.observe(viewLifecycleOwner,{
-        setFields(it.street,it.postCode,it.city)
+        viewModel.clientUserLiveData.observe(viewLifecycleOwner,{
+            if (it != null) {
+                setFields(it.addressStreet,it.addressPostCode,it.addressCity)
+            }
         })
 
 

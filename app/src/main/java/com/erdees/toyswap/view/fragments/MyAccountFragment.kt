@@ -23,6 +23,7 @@ import com.erdees.toyswap.databinding.FragmentMyAccountBinding
 import com.erdees.toyswap.model.firebase.ClientUser
 import com.erdees.toyswap.view.activities.MainActivity
 import com.erdees.toyswap.view.fragments.dialogs.ChangeAddressDialog
+import com.erdees.toyswap.view.fragments.dialogs.ChangeNameDialog
 import com.erdees.toyswap.view.fragments.dialogs.ReAuthenticateDialog
 import com.erdees.toyswap.viewModel.MyAccountFragmentViewModel
 import com.google.firebase.auth.FirebaseUser
@@ -66,16 +67,15 @@ class MyAccountFragment : Fragment() {
 
         viewModel.clientUserData.observe(viewLifecycleOwner, {
             if (it != null) {
-                thisClientUser = it
+                with(it) {
+                    if (addressStreet.isEmpty() && addressPostCode.isEmpty() && addressCity.isEmpty()) setEmptyFields()
+                    else setFields(addressStreet, addressPostCode, addressCity)
+
+                    setName("${it.firstName} ${it.lastName}")
+                }
             }
         })
 
-        viewModel.addressLiveData.observe(viewLifecycleOwner, { address ->
-            with(address) {
-                if (street.isEmpty() && postCode.isEmpty() && city.isEmpty()) setEmptyFields()
-                else setFields(street, postCode, city)
-            }
-        })
 
         viewModel.isUserLoggedOutLiveData.observe(viewLifecycleOwner, {
             if (it) restartActivity()
@@ -99,6 +99,11 @@ class MyAccountFragment : Fragment() {
             openGalleryForImage()
         }
 
+        binding.changeNameBtn.setOnClickListener {
+            val changeNameDialog = ChangeNameDialog()
+            changeNameDialog.show(childFragmentManager,ChangeNameDialog.TAG)
+        }
+
         return view
     }
 
@@ -118,6 +123,15 @@ class MyAccountFragment : Fragment() {
         startActivity(mainActivity)
     }
 
+    private fun setName(name: String){
+        if(name.isBlank()) binding.changeNameBtn.text = "Provide name"
+        else {
+            binding.accountFullNameTV.text = name
+            binding.changeNameBtn.text = "Change name"
+        }
+
+    }
+
     private fun setButtonsAccordingly() {
         viewModel.userAuthProviderLiveData.observe(viewLifecycleOwner, {
             if (it == "google.com") binding.changePasswordBtn.makeGone()
@@ -128,7 +142,8 @@ class MyAccountFragment : Fragment() {
     private fun setUserNameAndMail() {
         viewModel.clientUserData.observe(viewLifecycleOwner, {
             if (it != null) {
-                if (it.name.isNotBlank()) binding.accountFullNameTV.text = it.name
+                val name = it.firstName + " " + it.lastName
+                if (name.isNotBlank()) binding.accountFullNameTV.text = name
                 else binding.accountFullNameTV.text = ""
                 binding.accountEmailTV.text = it.emailAddress
             }
@@ -222,8 +237,6 @@ class MyAccountFragment : Fragment() {
             }
         }
     }
-
-
 
     private fun showLoading(){
          alertDialog = AlertDialog.Builder(requireContext())

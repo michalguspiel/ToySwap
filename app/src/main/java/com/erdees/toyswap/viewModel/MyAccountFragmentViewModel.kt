@@ -23,8 +23,6 @@ class MyAccountFragmentViewModel(application: Application) : AndroidViewModel(ap
 
     val userLiveData = authRepository.getUserLiveData()
 
-    val addressLiveData = authRepository.getUserAddressLiveData()
-
     val isUserLoggedOutLiveData = authRepository.getIsUserLoggedOutLiveData()
 
     val userAuthProviderLiveData = authRepository.getUserSignInProvider()
