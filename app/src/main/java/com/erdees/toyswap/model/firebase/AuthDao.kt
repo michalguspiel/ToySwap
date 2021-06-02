@@ -47,6 +47,7 @@ class AuthDao(private val application: Application) {
                 val lastName: String = it["lastName"].toString()
                 val email: String = it["emailAddress"].toString()
                 val points: Long = it["points"].toString().toLong()
+                val reputation: Long = it["reputation"].toString().toLong()
                 val avatar: String = it["avatar"].toString()
                 val addressCity: String = it["addressCity"].toString()
                 val addressPostCode: String = it["addressPostCode"].toString()
@@ -58,6 +59,7 @@ class AuthDao(private val application: Application) {
                         lastName,
                         email,
                         points,
+                        reputation,
                         avatar,
                         addressCity,
                         addressPostCode,
@@ -201,6 +203,7 @@ class AuthDao(private val application: Application) {
                 thisClient.lastName,
                 thisClient.emailAddress,
                 thisClient.points,
+                thisClient.reputation,
                 thisClient.avatar,
                 address.city,
                 address.postCode,
@@ -219,6 +222,7 @@ class AuthDao(private val application: Application) {
                 thisClient.lastName,
                 thisClient.emailAddress,
                 thisClient.points,
+                thisClient.reputation,
                 uri,
                 thisClient.addressCity,
                 thisClient.addressPostCode,
@@ -241,6 +245,7 @@ class AuthDao(private val application: Application) {
                 lastName,
                 thisClient.emailAddress,
                 thisClient.points,
+                thisClient.reputation,
                 thisClient.avatar,
                 thisClient.addressCity,
                 thisClient.addressPostCode,
