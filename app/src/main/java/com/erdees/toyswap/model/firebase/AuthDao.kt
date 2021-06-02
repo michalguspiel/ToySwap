@@ -10,11 +10,9 @@ import com.erdees.toyswap.model.Address
 import com.erdees.toyswap.model.Registration
 import com.erdees.toyswap.view.activities.LoginActivity
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.*
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -42,29 +40,41 @@ class AuthDao(private val application: Application) {
         updateUserLiveData()
     }
 
-    private fun saveFirebaseUserAsClientUser(docRef: DocumentReference) {
-        docRef.get().addOnSuccessListener {
-            val name: String = it["firstName"].toString()
-            val lastName : String = it["lastName"].toString()
-            val email: String = it["emailAddress"].toString()
-            val points: Long = it["points"].toString().toLong()
-            val avatar: String = it["avatar"].toString()
-            val addressCity: String = it["addressCity"].toString()
-            val addressPostCode: String = it["addressPostCode"].toString()
-            val addressStreet: String = it["addressStreet"].toString()
+    private fun saveFirebaseUserAsClientUser(docRef: DocumentReference?) {
+        if (docRef != null) {
+            docRef.get().addOnSuccessListener {
+                val name: String = it["firstName"].toString()
+                val lastName: String = it["lastName"].toString()
+                val email: String = it["emailAddress"].toString()
+                val points: Long = it["points"].toString().toLong()
+                val avatar: String = it["avatar"].toString()
+                val addressCity: String = it["addressCity"].toString()
+                val addressPostCode: String = it["addressPostCode"].toString()
+                val addressStreet: String = it["addressStreet"].toString()
 
-            setUserAddress(Address(addressStreet, addressPostCode, addressCity))
+                val thisSessionUser =
+                    ClientUser(
+                        name,
+                        lastName,
+                        email,
+                        points,
+                        avatar,
+                        addressCity,
+                        addressPostCode,
+                        addressStreet
+                    )
+                Log.i("TEST", "this session user saved ! $thisSessionUser")
+                clientUserLiveData.postValue(thisSessionUser)
+            }
+        }
+        else {
+            clientUserLiveData.postValue(null)
 
-            val thisSessionUser =
-                ClientUser(name,lastName, email, points, avatar, addressCity, addressPostCode, addressStreet)
-            Log.i("TEST", "this session user saved ! $thisSessionUser")
-            clientUserLiveData.postValue(thisSessionUser)
         }
     }
 
     private fun updateUserLiveData() {
         val fireBaseUser = firebaseAuth.currentUser
-        Log.i("TEST", " THIS THING IS CALLED DOES IT RUIN IT?")
         if (fireBaseUser != null) {
             firebaseUserLiveData.postValue(firebaseAuth.currentUser)
             fireBaseUser.getIdToken(false).addOnSuccessListener { userAuthProviderTokenLiveData.postValue(it.signInProvider) }
@@ -74,9 +84,10 @@ class AuthDao(private val application: Application) {
             docRefLiveData.postValue(docRef)
             saveFirebaseUserAsClientUser(docRef)
         } else {
-            isUserLoggedOutLiveData.postValue(true)
+            isUserLoggedOutLiveData.value = true
             firebaseUserLiveData.value = null
             clientUserLiveData.value = null
+            saveFirebaseUserAsClientUser(null)
         }
     }
 
@@ -97,23 +108,14 @@ class AuthDao(private val application: Application) {
         return userAuthProviderTokenLiveData
     }
 
-    fun registerWithPassword(registration: Registration) {
-        if (!registration.isLegit()) {
-            Toast.makeText(
-                application.applicationContext,
-                registration.errorMessage,
-                Toast.LENGTH_SHORT
-            ).show()
-        } else signUpWithEmail(registration)
-    }
 
-    private fun signUpWithEmail(registration: Registration) {
-        firebaseAuth.createUserWithEmailAndPassword(registration.mail, registration.password)
+     fun signUpWithEmail(registration: Registration) : Task<AuthResult> {
+        return firebaseAuth.createUserWithEmailAndPassword(registration.mail, registration.password)
             .addOnCompleteListener(ContextCompat.getMainExecutor(application)) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(LoginActivity.TAG, "createUserWithEmail:success")
-                    updateUserLiveData()
+                    if(firebaseAuth.currentUser != null) checkIfDocumentExistAndIfSoContinue()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(LoginActivity.TAG, "createUserWithEmail:failure", task.exception)
@@ -125,13 +127,13 @@ class AuthDao(private val application: Application) {
             }
     }
 
-    fun loginWithPassword(email: String, password: String) {
-        firebaseAuth.signInWithEmailAndPassword(email, password)
+    fun loginWithPassword(email: String, password: String) :Task <AuthResult> {
+      return  firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(ContextCompat.getMainExecutor(application)) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(LoginActivity.TAG, "signInWithEmail:success")
-                    updateUserLiveData()
+                    if(firebaseAuth.currentUser != null) checkIfDocumentExistAndIfSoContinue()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(LoginActivity.TAG, "signInWithEmail:failure", task.exception)
@@ -143,20 +145,32 @@ class AuthDao(private val application: Application) {
             }
     }
 
-    fun firebaseAuthWithGoogle(idToken: String) {
+    fun firebaseAuthWithGoogle(idToken: String) : Task<AuthResult> {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
-        firebaseAuth.signInWithCredential(credential)
+       return firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener(ContextCompat.getMainExecutor(application)) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(LoginActivity.TAG, "signInWithCredential:success")
-                    updateUserLiveData()
+                    if(firebaseAuth.currentUser != null) checkIfDocumentExistAndIfSoContinue()
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(LoginActivity.TAG, "signInWithCredential:failure", task.exception)
                 }
             }
 
+    }
+
+    private fun checkIfDocumentExistAndIfSoContinue(): Task<DocumentSnapshot> {
+        val docRef =
+            Firebase.firestore.collection("users").document(firebaseAuth.currentUser!!.uid)
+        return docRef.get().addOnSuccessListener {
+            if (!it.exists()) checkIfDocumentExistAndIfSoContinue()
+            else{
+                updateUserLiveData()
+            }
+        }
     }
 
     fun signOut() {
@@ -219,7 +233,7 @@ class AuthDao(private val application: Application) {
         return docRefLiveData.value?.update("avatar",uri)?.addOnSuccessListener { updateClientAvatar(uri)}
         }
 
-    fun updateClientName(firstName: String,lastName: String){
+    private fun updateClientName(firstName: String, lastName: String){
         val thisClient = clientUserLiveData.value
         if(thisClient != null){
             val updatedClient = ClientUser(
@@ -262,6 +276,7 @@ class AuthDao(private val application: Application) {
     fun getNewAvatarUrl() : Task<Uri> {
        return profilePicImageRef().downloadUrl
     }
+
 
 
 

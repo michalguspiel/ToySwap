@@ -78,7 +78,7 @@ class MyAccountFragment : Fragment() {
 
 
         viewModel.isUserLoggedOutLiveData.observe(viewLifecycleOwner, {
-            if (it) restartActivity()
+            if (it) openMainActivity()
         })
 
 
@@ -89,6 +89,7 @@ class MyAccountFragment : Fragment() {
 
         binding.logoutBtn.setOnClickListener {
             viewModel.signOut()
+            openMainActivity()
         }
 
         binding.changePasswordBtn.setOnClickListener {
@@ -118,7 +119,7 @@ class MyAccountFragment : Fragment() {
         reAuthDialog.show(childFragmentManager, ReAuthenticateDialog.TAG)
     }
 
-    private fun restartActivity() {
+    private fun openMainActivity() {
         val mainActivity = Intent(context, MainActivity::class.java)
         startActivity(mainActivity)
     }
