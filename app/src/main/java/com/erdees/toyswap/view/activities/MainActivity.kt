@@ -8,7 +8,7 @@ import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
 import com.erdees.toyswap.databinding.ActivityMainBinding
 import com.erdees.toyswap.view.fragments.AddItemFragment
-import com.erdees.toyswap.view.fragments.MainFragment
+import com.erdees.toyswap.view.fragments.BrowserFragment
 import com.erdees.toyswap.view.fragments.MyAccountFragment
 import com.erdees.toyswap.viewModel.MainActivityViewModel
 import com.google.firebase.auth.FirebaseUser
@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseUser
 class MainActivity : AppCompatActivity() {
 
     /**Fragments*/
-    private val mainFragment = MainFragment.newInstance()
+    private val mainFragment = BrowserFragment.newInstance()
     private val myAccountFragment = MyAccountFragment.newInstance()
     private val addFragment = AddItemFragment.newInstance()
 
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         viewBinding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId){
                 R.id.nav_mainFragment -> {
-                    Utils.openFragment(mainFragment,MainFragment.TAG,supportFragmentManager)
+                    Utils.openFragment(mainFragment,BrowserFragment.TAG,supportFragmentManager)
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.nav_addItemFragment -> {
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-        Utils.openFragment(mainFragment,MainFragment.TAG,supportFragmentManager)
+        Utils.openFragment(mainFragment,BrowserFragment.TAG,supportFragmentManager)
 
     }
 

@@ -6,6 +6,7 @@ import com.erdees.toyswap.model.Address
 import com.erdees.toyswap.model.Registration
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.storage.UploadTask
 
@@ -52,16 +53,16 @@ class AuthRepository(private val authDao: AuthDao) {
         return authDao.updateNames(firstName,lastName)
     }
 
-    fun registerWithPassword(registration: Registration){
-        authDao.registerWithPassword(registration)
+    fun registerWithPassword(registration: Registration): Task<AuthResult>{
+        return authDao.signUpWithEmail(registration)
     }
 
-    fun loginWithPassword(email: String, password: String){
-        authDao.loginWithPassword(email, password)
+    fun loginWithPassword(email: String, password: String) : Task<AuthResult>{
+       return authDao.loginWithPassword(email, password)
     }
 
-    fun firebaseAuthWithGoogle(idToken: String) {
-        authDao.firebaseAuthWithGoogle(idToken)
+    fun firebaseAuthWithGoogle(idToken: String) : Task<AuthResult> {
+      return   authDao.firebaseAuthWithGoogle(idToken)
     }
 
     fun signOut(){

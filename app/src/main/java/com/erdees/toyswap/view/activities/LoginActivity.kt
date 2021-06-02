@@ -1,9 +1,12 @@
 package com.erdees.toyswap.view.activities
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -24,6 +27,9 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: LoginActivityBinding
     private lateinit var view: View
     private lateinit var viewModel: LoginActivityViewModel
+
+    private lateinit var alertDialog: AlertDialog
+
 
     private val gso by lazy {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -46,25 +52,42 @@ class LoginActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(LoginActivityViewModel::class.java)
 
 
-        viewModel.isUserLoggedInLiveData.observe(this, { isUserLoggedOut ->
-            if (!isUserLoggedOut) openMainActivity()
+        viewModel.clientUserLiveData.observe(this,{userInClient ->
+            if(userInClient != null){
+                endLoading()
+                openMainActivity()
+            }
         })
 
         binding.signWithEmailBtn.setOnClickListener {
+            showLoading()
+            val email = binding.emailInput.text.toString()
+            val password =  binding.passwordInput.text.toString()
+            if(email.isEmpty() || password.isEmpty()) return@setOnClickListener
             viewModel.loginWithEmail(
-                binding.emailInput.text.toString(),
-                binding.passwordInput.text.toString()
-            )
+                email,
+                password
+            ).addOnFailureListener { endLoading() }
         }
         binding.signUpWithEmailBtn.setOnClickListener {
+            showLoading()
             val registration = Registration(
                 binding.signUpPasswordInput.text.toString(),
                 binding.signUpConfirmPasswordInput.text.toString(),
                 binding.signUpWithEmailInput.text.toString()
             )
-            viewModel.registerWithEmail(registration)
+            if(registration.isLegit()) viewModel.registerWithEmail(registration).addOnFailureListener { endLoading() }
+            else{
+                endLoading()
+                Toast.makeText(
+                    this,
+                    registration.errorMessage,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
         binding.signWithGoogleBtn.setOnClickListener {
+            showLoading()
             signInWithGoogle()
         }
         binding.welcomeSignInSwitch.setOnClickListener {
@@ -123,7 +146,7 @@ class LoginActivity : AppCompatActivity() {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)!!
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-                viewModel.signUpWithGoogle(account.idToken!!)
+                viewModel.signUpWithGoogle(account.idToken!!).addOnFailureListener { endLoading() }
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e)
@@ -131,8 +154,22 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private fun showLoading(){
+        alertDialog = AlertDialog.Builder(this)
+            .setCancelable(false)
+            .setMessage("Loading...")
+            .setView(ProgressBar(this))
+            .show()
+
+    }
+
+    private fun endLoading(){
+        alertDialog.dismiss()
+    }
+
     companion object {
         const val TAG = "WelcomeActivity"
+
     }
 }
 

@@ -12,16 +12,27 @@ admin.initializeApp();
       response.send("Hello from Firebase!");
  });
 
+ function sliceDisplayName(fullName)  {
+  return fullName.split(" ")
+ }
+
  exports.addUserToFireStore = functions.auth.user().onCreate((user) => {
     functions.logger.info("New user created!");
     var usersRef = admin.firestore().collection("users");
     var userName = user.displayName
+    var firstName = ""
+    var lastName = ""
+    if(userName != null){
+     var names = sliceDisplayName(userName)
+     if(names[0] != null)firstName = names[0]
+     if(names[1] != null)lastName = names[1]
+    }
     var userAvatar = user.photoURL
     if(userAvatar == null)userAvatar = ""
-    if(userName == null) userName = ""
 
         return usersRef.doc(user.uid).set({
-      name: userName,
+      firstName : firstName,
+      lastName: lastName,
       emailAddress : user.email,
       avatar: user.photoURL,
       addressCity: "",
