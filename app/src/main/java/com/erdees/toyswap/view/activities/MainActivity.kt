@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseUser
 class MainActivity : AppCompatActivity() {
 
     /**Fragments*/
-    private val mainFragment = BrowserFragment.newInstance()
+    private val browserFragment = BrowserFragment.newInstance()
     private val myAccountFragment = MyAccountFragment.newInstance()
     private val addFragment = AddItemFragment.newInstance()
 
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         viewBinding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId){
                 R.id.nav_mainFragment -> {
-                    Utils.openFragment(mainFragment,BrowserFragment.TAG,supportFragmentManager)
+                    Utils.openFragment(browserFragment,BrowserFragment.TAG,supportFragmentManager)
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.nav_addItemFragment -> {
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-        Utils.openFragment(mainFragment,BrowserFragment.TAG,supportFragmentManager)
+        Utils.openFragment(browserFragment,BrowserFragment.TAG,supportFragmentManager)
 
     }
 

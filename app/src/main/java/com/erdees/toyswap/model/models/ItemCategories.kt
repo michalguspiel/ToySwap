@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model
+package com.erdees.toyswap.model.models
 
 /**
  * I decided to make this sort of "NODES" in order to implement feature where user have to
@@ -9,7 +9,7 @@ package com.erdees.toyswap.model
 class ItemCategories {
     /**Main Categories*/
     object Kids : ItemCategory("Kids", null, listOf(Toys))
-    object Sports : ItemCategory("Sport",null, listOf(Bikes,Teamsports))
+    object Sports : ItemCategory("Sport",null, listOf(Bikes, Teamsports))
     /**Sub Categories*/
     object Bikes : ItemCategory("Bikes", Sports, listOf(AdultBikes, KidsBikes))
     object Teamsports : ItemCategory("Team sports", Sports, null)
@@ -20,7 +20,7 @@ class ItemCategories {
     object Dolls : ItemCategory("Toys", Toys, null)
     object Cars : ItemCategory("Toys", Toys, null)
 
-    object AdultBikes : ItemCategory("Adult bikes",Bikes,null)
-    object KidsBikes : ItemCategory("Kids bikes",Bikes,null)
+    object AdultBikes : ItemCategory("Adult bikes", Bikes,null)
+    object KidsBikes : ItemCategory("Kids bikes", Bikes,null)
 
 }

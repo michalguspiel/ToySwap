@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model.firebase
+package com.erdees.toyswap.model.firebaseAuth
 
 import android.app.Application
 import android.net.Uri
@@ -6,8 +6,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import com.erdees.toyswap.model.Address
 import com.erdees.toyswap.model.Registration
+import com.erdees.toyswap.model.models.Address
+import com.erdees.toyswap.model.models.ClientUser
 import com.erdees.toyswap.view.activities.LoginActivity
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
