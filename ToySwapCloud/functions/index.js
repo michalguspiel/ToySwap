@@ -3,6 +3,9 @@ const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access Firestore.
 const admin = require('firebase-admin');
+
+const timestamp = admin.firestore.FieldValue.serverTimestamp();
+
 admin.initializeApp();
 // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -38,6 +41,8 @@ admin.initializeApp();
       addressCity: "",
       addressPostCode: "",
       addressStreet: "",
-      points: 0, // 0 points IDK for what Ill use them yet. 
+      points: 0,  // 0 points IDK for what Ill use them yet. 
+      reputation : 1000 ,
+      accCreationTimestamp : timestamp
     });
   });

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.databinding.FragmentBrowserBinding
+import com.erdees.toyswap.view.adapters.BrowserFragmentRVAdapter
 import com.erdees.toyswap.viewModel.BrowserFragmentViewModel
 
 /**JUST A PROTOTYPE FOR NOW ILL MAKE A RECYCLER VIEW WITH FIREBASE RV ADAPTER WHERE ILL QUERY ALL ITEMS THAT ARE IN DATABASE
@@ -26,9 +27,8 @@ class BrowserFragment : Fragment(){
         val view = binding.root
         viewModel = ViewModelProvider(this).get(BrowserFragmentViewModel::class.java)
 
-        /**TODO IMPLEMENT NEW DAO,REPO AND VIEWMODEL FOR QUERRING PRODUCTS THEN GET THEM HERE AND PROVIDE OPTIONS TO ADAPTER :) */
-        //viewModel.getOptions()
-        //binding.browserFragmentRV.adapter = BrowserFragmentRVAdapter(options,)
+        val options = viewModel.getOptions(viewLifecycleOwner)
+        binding.browserFragmentRV.adapter = BrowserFragmentRVAdapter(options,requireActivity(),parentFragmentManager)
 
 
         return view

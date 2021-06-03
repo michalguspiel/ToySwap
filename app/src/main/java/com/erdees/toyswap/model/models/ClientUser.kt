@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model.firebase
+package com.erdees.toyswap.model.models
 
 data class ClientUser(
     val firstName: String = "",

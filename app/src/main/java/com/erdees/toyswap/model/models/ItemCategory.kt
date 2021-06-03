@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model
+package com.erdees.toyswap.model.models
 
 open class ItemCategory(
     val categoryName : String,

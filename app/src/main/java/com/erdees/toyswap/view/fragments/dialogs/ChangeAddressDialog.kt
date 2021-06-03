@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.Utils.makeSnackbar
 import com.erdees.toyswap.Utils.makeToast
 import com.erdees.toyswap.databinding.DialogChangeAddressBinding
-import com.erdees.toyswap.model.Address
+import com.erdees.toyswap.model.models.Address
 import com.erdees.toyswap.viewModel.ChangeAddressDialogViewModel
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
