@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.erdees.toyswap.databinding.FragmentBrowserBinding
 import com.erdees.toyswap.view.adapters.BrowserFragmentRVAdapter
 import com.erdees.toyswap.viewModel.BrowserFragmentViewModel
@@ -27,9 +28,12 @@ class BrowserFragment : Fragment(){
         val view = binding.root
         viewModel = ViewModelProvider(this).get(BrowserFragmentViewModel::class.java)
 
-        val options = viewModel.getOptions(viewLifecycleOwner)
-        binding.browserFragmentRV.adapter = BrowserFragmentRVAdapter(options,requireActivity(),parentFragmentManager)
 
+        val options = viewModel.getOptions(this)
+
+        val adapter = BrowserFragmentRVAdapter(options,requireActivity(),parentFragmentManager)
+        binding.browserFragmentRV.adapter = adapter
+        binding.browserFragmentRV.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
 
         return view
     }
