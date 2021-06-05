@@ -3,8 +3,8 @@ package com.erdees.toyswap.viewModel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.toyswap.model.Registration
-import com.erdees.toyswap.model.firebase.AuthDao
-import com.erdees.toyswap.model.firebase.AuthRepository
+import com.erdees.toyswap.model.firebaseAuth.AuthDao
+import com.erdees.toyswap.model.firebaseAuth.AuthRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 

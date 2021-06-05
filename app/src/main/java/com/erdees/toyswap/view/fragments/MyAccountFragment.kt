@@ -20,7 +20,7 @@ import com.erdees.toyswap.Constants
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
-import com.erdees.toyswap.model.firebase.ClientUser
+import com.erdees.toyswap.model.models.ClientUser
 import com.erdees.toyswap.view.activities.MainActivity
 import com.erdees.toyswap.view.fragments.dialogs.ChangeAddressDialog
 import com.erdees.toyswap.view.fragments.dialogs.ChangeNameDialog
