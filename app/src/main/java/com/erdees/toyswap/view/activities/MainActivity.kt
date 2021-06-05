@@ -9,6 +9,7 @@ import com.erdees.toyswap.Utils
 import com.erdees.toyswap.databinding.ActivityMainBinding
 import com.erdees.toyswap.view.fragments.AddItemFragment
 import com.erdees.toyswap.view.fragments.BrowserFragment
+import com.erdees.toyswap.view.fragments.ChatFragment
 import com.erdees.toyswap.view.fragments.MyAccountFragment
 import com.erdees.toyswap.viewModel.MainActivityViewModel
 import com.google.firebase.auth.FirebaseUser
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private val browserFragment = BrowserFragment.newInstance()
     private val myAccountFragment = MyAccountFragment.newInstance()
     private val addFragment = AddItemFragment.newInstance()
+    private val chatFragment = ChatFragment.newInstance()
 
     private lateinit var viewModel : MainActivityViewModel
     private lateinit var viewBinding: ActivityMainBinding
@@ -58,8 +60,9 @@ class MainActivity : AppCompatActivity() {
                     else openLoginActivity()
                 }
                 R.id.nav_messagesFragment -> {
-                  // TODO   if(!isUserLoggedOut)Utils.openFragment(chatFragment,ChatFragment.TAG,supportFragmentManager)
-                    //else TODO openLoginActivity()
+                     if(!isUserLoggedOut)Utils.openFragment(chatFragment,
+                         ChatFragment.TAG,supportFragmentManager)
+                    else  openLoginActivity()
                 }
                 else -> {}
             }
