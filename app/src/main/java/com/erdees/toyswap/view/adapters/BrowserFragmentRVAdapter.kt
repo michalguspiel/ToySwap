@@ -19,14 +19,13 @@ class BrowserFragmentRVAdapter(
     val fm: FragmentManager
 ) : FirestorePagingAdapter<Item, BrowserFragmentRVAdapter.BrowserFragmentViewHolder>(options) {
 
-
     class BrowserFragmentViewHolder(val viewBinding: ItemRecyclerItemBinding) : RecyclerView.ViewHolder(viewBinding.root)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): BrowserFragmentViewHolder {
-        val view = ItemRecyclerItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        val view = ItemRecyclerItemBinding.inflate(LayoutInflater.from(activity),parent,false)
        return BrowserFragmentViewHolder(view)
     }
 
@@ -35,6 +34,7 @@ class BrowserFragmentRVAdapter(
         position: Int,
         model: Item
     ) {
+        Log.i("ADAPTER TEST" , "${model.name} , $model")
         holder.viewBinding.titleTV.text = model.name
         holder.viewBinding.price.text = java.text.NumberFormat.getCurrencyInstance(Locale.FRENCH).format(model.price)
         Glide.with(activity)

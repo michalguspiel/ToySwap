@@ -7,6 +7,7 @@ package com.erdees.toyswap.model.models
  * */
 
 class ItemCategories {
+    object Category : ItemCategory("Category",null,listOf())
     /**Main Categories*/
     object Kids : ItemCategory("Kids", null, listOf(Toys))
     object Sports : ItemCategory("Sport",null, listOf(Bikes, Teamsports))
