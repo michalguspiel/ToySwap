@@ -8,6 +8,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
 
 object Utils {
@@ -56,4 +59,15 @@ object Utils {
     fun ViewGroup.endLoading(progressBar: ProgressBar) {
         this.removeView(progressBar)
     }
+
+    fun <T> LiveData<T>.ignoreFirst(): MutableLiveData<T> {
+        val result = MediatorLiveData<T>()
+        var isFirst = true
+        result.addSource(this) {
+            if (isFirst) isFirst = false
+            else result.value = it
+        }
+        return result
+    }
+
 }

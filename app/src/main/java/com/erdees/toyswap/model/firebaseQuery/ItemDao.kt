@@ -3,7 +3,7 @@ package com.erdees.toyswap.model.firebaseQuery
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.paging.PagedList
-import com.erdees.toyswap.model.models.Item
+import com.erdees.toyswap.model.models.item.Item
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase

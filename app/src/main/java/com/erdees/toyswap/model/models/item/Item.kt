@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model.models
+package com.erdees.toyswap.model.models.item
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference

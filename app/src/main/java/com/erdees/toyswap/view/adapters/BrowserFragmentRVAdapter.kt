@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.erdees.toyswap.databinding.ItemRecyclerItemBinding
-import com.erdees.toyswap.model.models.Item
+import com.erdees.toyswap.model.models.item.Item
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import java.util.*
