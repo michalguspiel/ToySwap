@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
     id 'com.google.gms.google-services'
     id 'kotlin-kapt'
+    id("dagger.hilt.android.plugin")
+
 }
 
 android {
@@ -11,12 +13,16 @@ android {
 
     defaultConfig {
         applicationId "com.erdees.toyswap"
-        minSdkVersion 19
+        minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    testOptions{
+        unitTests.returnDefaultValues = true
     }
 
     buildFeatures{
@@ -100,6 +106,10 @@ dependencies {
 
     /**IMAGE CROPPER*/
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+
+    /**HILT*/
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
 
 
     /**TESTS*/

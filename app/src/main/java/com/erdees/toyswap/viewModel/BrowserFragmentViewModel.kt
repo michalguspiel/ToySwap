@@ -4,7 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.erdees.toyswap.model.firebaseQuery.ItemDao
 import com.erdees.toyswap.model.firebaseQuery.ItemRepository
-import com.erdees.toyswap.model.models.Item
+import com.erdees.toyswap.model.models.item.Item
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 
 class BrowserFragmentViewModel : ViewModel() {

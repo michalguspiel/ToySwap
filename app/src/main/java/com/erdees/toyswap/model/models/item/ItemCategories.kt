@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model.models
+package com.erdees.toyswap.model.models.item
 
 /**
  * I decided to make this sort of "NODES" in order to implement feature where user have to
@@ -7,10 +7,10 @@ package com.erdees.toyswap.model.models
  * */
 
 class ItemCategories {
-    object Category : ItemCategory("Category",null,listOf())
+    object MainCategory : ItemCategory("Category",null,listOf(Kids, Sports))
     /**Main Categories*/
-    object Kids : ItemCategory("Kids", null, listOf(Toys))
-    object Sports : ItemCategory("Sport",null, listOf(Bikes, Teamsports))
+    object Kids : ItemCategory("Kids", MainCategory, listOf(Toys))
+    object Sports : ItemCategory("Sport",MainCategory, listOf(Bikes, Teamsports, Individualsports))
     /**Sub Categories*/
     object Bikes : ItemCategory("Bikes", Sports, listOf(AdultBikes, KidsBikes))
     object Teamsports : ItemCategory("Team sports", Sports, null)
@@ -18,10 +18,25 @@ class ItemCategories {
     object Toys : ItemCategory("Toys", Kids, listOf(Cars, Dolls))
 
     /**Children categories*/
-    object Dolls : ItemCategory("Toys", Toys, null)
-    object Cars : ItemCategory("Toys", Toys, null)
+    object Dolls : ItemCategory("Dolls", Toys, null)
+    object Cars : ItemCategory("Cars", Toys, null)
 
-    object AdultBikes : ItemCategory("Adult bikes", Bikes,null)
+    object AdultBikes : ItemCategory("Adult bikes", Bikes,listOf(MountainBike))
     object KidsBikes : ItemCategory("Kids bikes", Bikes,null)
+
+
+    object MountainBike : ItemCategory("Mountain Bikes",Bikes,null)
+
+
+    var currentCategory: ItemCategory = MainCategory
+
+
+    fun isCategoryFinal(): Boolean {
+      return  currentCategory.children == null
+    }
+
+    fun pickCategory(pickedCategory: ItemCategory) {
+        currentCategory = pickedCategory
+    }
 
 }

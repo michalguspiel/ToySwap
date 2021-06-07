@@ -13,7 +13,7 @@ import com.erdees.toyswap.view.fragments.ChatFragment
 import com.erdees.toyswap.view.fragments.MyAccountFragment
 import com.erdees.toyswap.viewModel.MainActivityViewModel
 import com.google.firebase.auth.FirebaseUser
-
+import dagger.hilt.android.AndroidEntryPoint
 
 class MainActivity : AppCompatActivity() {
 
