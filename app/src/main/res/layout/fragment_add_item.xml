@@ -111,13 +111,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+        <GridLayout
+            android:id="@+id/addItemPicturesLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/itemChooseCategoryBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:columnCount="3"
+            android:rowCount="2"
+            android:layout_marginTop="12dp"
+            />
     <Button
         android:id="@+id/itemAddPictureBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add picture"
         android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/itemChooseCategoryBtn"
+        app:layout_constraintTop_toBottomOf="@id/addItemPicturesLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

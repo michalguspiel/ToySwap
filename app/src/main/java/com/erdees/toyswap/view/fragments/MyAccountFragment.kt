@@ -17,6 +17,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.erdees.toyswap.Constants
+import com.erdees.toyswap.Constants.REQUEST_CODE
+import com.erdees.toyswap.Utils.launchImageCrop
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
@@ -28,7 +30,6 @@ import com.erdees.toyswap.view.fragments.dialogs.ReAuthenticateDialog
 import com.erdees.toyswap.viewModel.MyAccountFragmentViewModel
 import com.google.firebase.auth.FirebaseUser
 import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
 
 
 class MyAccountFragment : Fragment() {
@@ -111,7 +112,6 @@ class MyAccountFragment : Fragment() {
     companion object {
         fun newInstance(): MyAccountFragment = MyAccountFragment()
         const val TAG = "MyAccountFragment"
-        const val REQUEST_CODE = 149
     }
 
     private fun openDialogToReAuthenticate() {
@@ -194,14 +194,6 @@ class MyAccountFragment : Fragment() {
     }
 
 
-    private fun launchImageCrop(uri: Uri) {
-        CropImage.activity(uri)
-            .setGuidelines(CropImageView.Guidelines.ON)
-            .setAspectRatio(400, 400)
-            .setCropShape(CropImageView.CropShape.RECTANGLE)
-            .start(context!!, this)
-    }
-
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
@@ -214,7 +206,7 @@ class MyAccountFragment : Fragment() {
         )
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null && data.data != null) {
             data.data?.let { uri ->
-                launchImageCrop(uri)
+                launchImageCrop(uri,requireContext(),this,400,400)
             }
         } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)

@@ -1,5 +1,7 @@
 package com.erdees.toyswap
 
+import android.content.Context
+import android.net.Uri
 import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +14,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 
 object Utils {
 
@@ -68,6 +72,15 @@ object Utils {
             else result.value = it
         }
         return result
+    }
+
+
+     fun launchImageCrop(uri: Uri,context: Context,fragment: Fragment,x: Int,y:Int) {
+        CropImage.activity(uri)
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .setAspectRatio(x, y)
+            .setCropShape(CropImageView.CropShape.RECTANGLE)
+            .start(context, fragment)
     }
 
 }
