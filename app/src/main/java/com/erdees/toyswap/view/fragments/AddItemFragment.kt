@@ -1,10 +1,12 @@
 package com.erdees.toyswap.view.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -17,15 +19,19 @@ import com.erdees.toyswap.databinding.FragmentAddItemBinding
 import com.erdees.toyswap.databinding.PictureGridItemBinding
 import com.erdees.toyswap.model.models.item.ItemCategory
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
+import com.erdees.toyswap.view.fragments.dialogs.PicturePreviewDialog
 import com.erdees.toyswap.viewModel.AddItemFragmentViewModel
 import com.theartofdev.edmodo.cropper.CropImage
 
 class AddItemFragment : Fragment() {
 
+
     private var _binding : FragmentAddItemBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var pickedCategory: ItemCategory
+
+    private lateinit var picturePreview : PicturePreviewDialog
 
     private lateinit var viewModel : AddItemFragmentViewModel
 
@@ -33,11 +39,13 @@ class AddItemFragment : Fragment() {
         ChooseCategoryDialog.newInstance()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAddItemBinding.inflate(inflater,container,false)
+
         val view = binding.root
         viewModel = ViewModelProvider(this).get(AddItemFragmentViewModel::class.java)
 
@@ -66,7 +74,25 @@ class AddItemFragment : Fragment() {
                     Glide.with(requireActivity())
                         .load(eachPic)
                         .into(thisBinding.gridItemPicture)
+                
+                thisBinding.gridItemPicture.setOnTouchListener { v, event ->
+                    val action = event.action
+                    view.requestDisallowInterceptTouchEvent(true)
+                    Log.i(TAG,action.toString())
+                    when (action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            binding.root.disableScrollView()
+                            picturePreview = PicturePreviewDialog.newInstance(eachPic)
+                            picturePreview.show(parentFragmentManager, TAG)
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            binding.root.enableScrollView()
+                            picturePreview.dismiss()
 
+                        }
+                    }
+                        return@setOnTouchListener true
+                }
 
                 thisBinding.gridRemovePicBtn.setOnClickListener{
                     viewModel.removePicture(eachPic)
