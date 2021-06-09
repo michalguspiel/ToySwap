@@ -27,9 +27,11 @@ class PicturePreviewDialog(private val picUri: Uri) : DialogFragment() {
 
         Glide.with(requireContext())
             .load(picUri)
+            .centerCrop()
             .into(binding.imagePreview)
 
-         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return view
     }
 
