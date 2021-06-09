@@ -5,8 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="4dp"
     android:layout_marginVertical="4dp"
-    android:layout_marginHorizontal="8dp"
+    android:layout_marginHorizontal="18dp"
     app:cardCornerRadius="7dp"
+    android:padding="4dp"
     android:backgroundTint="@color/light_gray"
     app:cardPreventCornerOverlap="true"
     android:layout_height="wrap_content">
@@ -21,23 +22,25 @@
     <TextView
         android:id="@+id/gridItemHead"
         android:layout_width="wrap_content"
-        android:textSize="22sp"
-        android:layout_height="34dp"
+        android:textSize="14sp"
+        android:layout_height="wrap_content"
+        android:minHeight="10dp"
         android:layout_gravity="top|center_horizontal"
         tools:text="Main Picture" />
 
     <ImageView
         android:id="@+id/gridItemPicture"
-        android:layout_width="140dp"
-        android:layout_height="150dp"
+        android:layout_width="100dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="140dp"
         tools:src="@tools:sample/avatars"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/gridRemovePicBtn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_marginTop="4dp"
-        android:text="Remove picture"
+        android:text="Delete"
         android:textSize="12sp"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_gravity="bottom|center_horizontal"/>

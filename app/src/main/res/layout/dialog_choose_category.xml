@@ -23,7 +23,6 @@
         android:alignmentMode="alignBounds"
         android:rowCount="4"
         android:columnCount="3"
-
         android:padding="12dp"
         android:layout_height="wrap_content" />
 

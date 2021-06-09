@@ -74,7 +74,7 @@ class AddItemFragment : Fragment() {
                     Glide.with(requireActivity())
                         .load(eachPic)
                         .into(thisBinding.gridItemPicture)
-                
+
                 thisBinding.gridItemPicture.setOnTouchListener { v, event ->
                     val action = event.action
                     view.requestDisallowInterceptTouchEvent(true)
