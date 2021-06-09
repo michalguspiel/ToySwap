@@ -1,6 +1,7 @@
 package com.erdees.toyswap.view.fragments.dialogs
 
-import android.annotation.SuppressLint
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,7 +16,6 @@ class PicturePreviewDialog(private val picUri: Uri) : DialogFragment() {
     private var _binding: PicturePreviewDialogBinding? = null
     private val binding get() = _binding!!
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,6 +29,7 @@ class PicturePreviewDialog(private val picUri: Uri) : DialogFragment() {
             .load(picUri)
             .into(binding.imagePreview)
 
+         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return view
     }
 
