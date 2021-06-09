@@ -1,5 +1,7 @@
 package com.erdees.toyswap
 
+import android.content.Context
+import android.net.Uri
 import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
@@ -8,7 +10,12 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 
 object Utils {
 
@@ -56,4 +63,24 @@ object Utils {
     fun ViewGroup.endLoading(progressBar: ProgressBar) {
         this.removeView(progressBar)
     }
+
+    fun <T> LiveData<T>.ignoreFirst(): MutableLiveData<T> {
+        val result = MediatorLiveData<T>()
+        var isFirst = true
+        result.addSource(this) {
+            if (isFirst) isFirst = false
+            else result.value = it
+        }
+        return result
+    }
+
+
+     fun launchImageCrop(uri: Uri,context: Context,fragment: Fragment,x: Int,y:Int) {
+        CropImage.activity(uri)
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .setAspectRatio(x, y)
+            .setCropShape(CropImageView.CropShape.RECTANGLE)
+            .start(context, fragment)
+    }
+
 }
