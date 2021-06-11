@@ -30,4 +30,32 @@ class CustomListRearrangerTest {
         val testList = listOf(0,1,2,3,4,5,6,7,8,9)
         assertEquals(listOf(0,1,2,3,4,9,5,6,7,8),testList.rearrange(9,5))
     }
+
+    @Test
+    fun `Given i have list 1 to 20 and im changing last number to 10 pos and 15th element to 17th pos return list should be correct `(){
+        val range = 1 until 21
+        val list = mutableListOf<Int>()
+        for (i in range)list += i
+        list.forEach { print("$it ") }
+        val newList = list.rearrange(19,10)
+        val finalList = newList.rearrange(15,17)
+        assertEquals(listOf(1,2,3,4,5,6,7,8,9,10,20,11,12,13,14,16,17,15,18,19),finalList)
+    }
+
+    @Test
+    fun `TESTING LONG LIST`(){
+        val range = 0 until(9999)
+        var mutableList = mutableListOf<Int>()
+        for(i in range) mutableList.add(i)
+        val changedList = mutableList.rearrange(0,9998)
+
+        var checkList = mutableListOf<Int>()
+        for(i in range.drop(1)) checkList.add(i)
+        checkList.add(range.first)
+        assertEquals(changedList,checkList)
+
+
+
+    }
+
 }
