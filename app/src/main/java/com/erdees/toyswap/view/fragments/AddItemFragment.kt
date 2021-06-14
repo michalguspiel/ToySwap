@@ -7,8 +7,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
+import android.widget.GridLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
@@ -16,8 +19,11 @@ import com.erdees.toyswap.Constants
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
 import com.erdees.toyswap.Utils.makeGone
+import com.erdees.toyswap.Utils.makeInvisible
+import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.databinding.FragmentAddItemBinding
 import com.erdees.toyswap.databinding.PictureGridItemBinding
+import com.erdees.toyswap.databinding.PictureGridMarginBinding
 import com.erdees.toyswap.model.models.item.ItemCategory
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
 import com.erdees.toyswap.view.fragments.dialogs.PicturePreviewDialog
@@ -30,6 +36,7 @@ class AddItemFragment : Fragment() {
     private var _binding: FragmentAddItemBinding? = null
     private val binding get() = _binding!!
 
+    private var indexOfMovedElement: Int = 999 // changed during app run
     private lateinit var pickedCategory: ItemCategory
 
     private lateinit var picturePreview: PicturePreviewDialog
@@ -111,85 +118,150 @@ class AddItemFragment : Fragment() {
     }
 
 
+    private fun addEachMargin(index : Int){
+        val eachMargin = LayoutInflater.from(requireContext()).inflate(R.layout.picture_grid_margin,null,false)
+        val marginBinding = PictureGridMarginBinding.bind(eachMargin)
+        binding.addItemPicturesLayout.addView(eachMargin) // ADDING MARGIN MANUALLY AS A VIEW BEFORE EACH LAYOUT TO DETECT WHERE DRAG AND DROP ENDED!
+            Log.i(TAG,"Margin of index $index x: ${eachMargin.x} y: ${eachMargin.y}  pos: $eachMargin.")
+        eachMargin.setOnDragListener { v, event ->
+            val action = event.action
+            when(action) {
+                DragEvent.ACTION_DROP -> {
+                    Log.i(TAG, "DROPPED IN $index margin!!!")
+                    viewModel.rearrangePictures(indexOfMovedElement, index)
+                }
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    marginBinding.pictureGridMarginRow.makeVisible()
+                }
+                DragEvent.ACTION_DRAG_EXITED -> {
+                    marginBinding.pictureGridMarginRow.makeInvisible()
+                }
+                }
+            return@setOnDragListener true
+        }
+    }
+
+
+   private fun View.setMargins(topMargin : Int,bottomMargin : Int) {
+       val layoutParams = GridLayout.LayoutParams()
+       layoutParams.topMargin = topMargin
+       layoutParams.bottomMargin = bottomMargin
+       this.layoutParams = layoutParams
+   }
+
+    private fun PictureGridItemBinding.setUp(eachPic: Uri,picList: List<Uri>){
+        if (eachPic == picList.first()) this.gridItemHead.text = "Main picture"
+        Glide.with(requireActivity())
+            .load(eachPic)
+            .into(this.gridItemPicture)
+    }
+
     @SuppressLint("ClickableViewAccessibility")
-    fun buildPictureGridLayout(picList : List<Uri>){
+    private fun PictureGridItemBinding.setPictureTouchListener(eachPic : Uri){
+        this.gridItemPicture.setOnTouchListener { v, event ->
+            val action = event.action
+            binding.root.requestDisallowInterceptTouchEvent(true)
+            when (action) {
+                MotionEvent.ACTION_DOWN -> {
+                    binding.root.disableScrollView()
+                    picturePreview = PicturePreviewDialog.newInstance(eachPic)
+                    picturePreview.show(parentFragmentManager, TAG)
+                }
+                MotionEvent.ACTION_UP -> {
+                    binding.root.enableScrollView()
+                    picturePreview.dismiss()
+
+                }
+            }
+            return@setOnTouchListener true
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun PictureGridItemBinding.setLayoutTouchListener(picList: List<Uri>,eachPic: Uri){
+        this.gridItemLayout.setOnTouchListener { view, event ->
+            val indexOfElement = picList.indexOf(eachPic)
+            //TODO WHEN THIS IS BEING DRAGGED IT'S MARGINS SHOULD BE GONE FOR THE TIME OF DRAGGIN.
+            indexOfMovedElement = indexOfElement
+            val action = event.action
+            when (action) {
+                MotionEvent.ACTION_DOWN -> {
+                    val data = ClipData.newPlainText("", "")
+                    val shadowBuilder = View.DragShadowBuilder(view)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        view.startDragAndDrop(data, shadowBuilder, view, 0)
+                    } else {
+                        view.startDrag(data, shadowBuilder, view, 0)
+                    }
+                    view.makeGone()
+                    return@setOnTouchListener true
+                }
+                else ->{
+                    Log.i(TAG, " Motion ACTION  ELSE! ${action}")
+                    return@setOnTouchListener true
+                }
+            }
+        }
+    }
+
+    private fun PictureGridItemBinding.setLayoutDragListener(picList: List<Uri>){
+        this.gridItemLayout.setOnDragListener { v, event ->
+            val action = event.action
+            when (action) {
+                DragEvent.ACTION_DRAG_STARTED -> {
+                    Log.i(TAG, "START DRAGGIN")
+                }
+                DragEvent.ACTION_DRAG_ENDED -> {
+                    Log.i(TAG,"LOC: x: ${event.x} , y: ${event.y} ")
+                    Handler(Looper.getMainLooper()).post {
+                        buildPictureGridLayout(picList)
+                    }
+                    //  buildPictureGridLayout(picList)//  this causes crash if I drop item inside grid layout
+                    Log.i(TAG, "END DRAGGIN")
+                }
+                DragEvent.ACTION_DROP -> { // TODO THIS SHOULD DETECT BETWEEN WHICH ITEMS IN GRID THIS VIEW WAS DROPPED AND THEN CALL CustomListRearranger on list of items through view model.
+                    // THIS IS CALLED ONLY WHEN I DROP ITEM TO ANOTHER ITEM FROM SAME GRID!!!
+                    Log.i(TAG, "DRAGGIN DROP")
+                }
+                DragEvent.ACTION_DRAG_LOCATION -> {
+                    Log.i(TAG,"LOC: x: ${event.x} , y: ${event.y} ")
+                }
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    Log.i(TAG, "DRAG ENTERED!")
+                }
+                else -> Log.i(TAG,"DRAGGIN ELSEEE!! $action")
+            }
+
+            return@setOnDragListener true
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun addEachPictureCard(picList: List<Uri>, eachPic : Uri) {
+        val eachPictureCard =
+            LayoutInflater.from(requireContext())
+                .inflate(R.layout.picture_grid_item, null, false)
+        val thisBinding = PictureGridItemBinding.bind(eachPictureCard)
+        eachPictureCard.setMargins(6,6)
+        thisBinding.setUp(eachPic,picList)
+        thisBinding.setPictureTouchListener(eachPic)
+        thisBinding.setLayoutTouchListener(picList,eachPic)
+        thisBinding.setLayoutDragListener(picList)
+
+        thisBinding.gridRemovePicBtn.setOnClickListener {
+            viewModel.removePicture(eachPic)
+        }
+        binding.addItemPicturesLayout.addView(eachPictureCard)
+    }
+
+
+    private fun buildPictureGridLayout(picList : List<Uri>) {
         binding.addItemPicturesLayout.removeAllViews()
         for (eachPic in picList) {
-            val eachPictureCard =
-                LayoutInflater.from(requireContext())
-                    .inflate(R.layout.picture_grid_item, null, false)
-            val thisBinding = PictureGridItemBinding.bind(eachPictureCard)
-            if (eachPic == picList.first()) thisBinding.gridItemHead.text = "Main picture"
-            Glide.with(requireActivity())
-                .load(eachPic)
-                .into(thisBinding.gridItemPicture)
-
-            thisBinding.gridItemPicture.setOnTouchListener { v, event ->
-                val action = event.action
-                binding.root.requestDisallowInterceptTouchEvent(true)
-                Log.i(TAG, action.toString())
-                when (action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        binding.root.disableScrollView()
-                        picturePreview = PicturePreviewDialog.newInstance(eachPic)
-                        picturePreview.show(parentFragmentManager, TAG)
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        binding.root.enableScrollView()
-                        picturePreview.dismiss()
-
-                    }
-                }
-                return@setOnTouchListener true
-            }
-
-            thisBinding.gridItemLayout.setOnTouchListener { view, event ->
-                val action = event.action
-                when (action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        val data = ClipData.newPlainText("", "")
-                        val shadowBuilder = View.DragShadowBuilder(view)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            view.startDragAndDrop(data, shadowBuilder, view, 0)
-                        } else {
-                            view.startDrag(data, shadowBuilder, view, 0)
-                        }
-                        view.makeGone()
-                        return@setOnTouchListener true
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        buildPictureGridLayout(picList)
-                        return@setOnTouchListener true
-                    }
-                    else ->{
-                        buildPictureGridLayout(picList)
-                        return@setOnTouchListener false
-                    }
-                }
-            }
-
-            thisBinding.gridItemLayout.setOnDragListener { v, event ->
-                val action = event.action
-                when (action) {
-                    DragEvent.ACTION_DRAG_STARTED -> {
-                        Log.i(TAG, "START DRAGGIN")
-                    }
-                    DragEvent.ACTION_DRAG_ENDED -> {
-                        buildPictureGridLayout(picList)
-                        Log.i(TAG, "END DRAGGIN")
-                    }
-                    DragEvent.ACTION_DROP -> {
-                        buildPictureGridLayout(picList)
-                    }
-                }
-
-                return@setOnDragListener true
-            }
-
-            thisBinding.gridRemovePicBtn.setOnClickListener {
-                viewModel.removePicture(eachPic)
-            }
-            binding.addItemPicturesLayout.addView(eachPictureCard)
+            val indexOfEachPic = picList.indexOf(eachPic) // Index is important to keep track of margins.
+            addEachMargin(indexOfEachPic)
+            addEachPictureCard(picList, eachPic)
+            if(eachPic == picList.last()) addEachMargin(indexOfEachPic)
         }
     }
 
