@@ -19,16 +19,14 @@ import com.erdees.toyswap.Constants
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
 import com.erdees.toyswap.Utils.makeGone
-import com.erdees.toyswap.Utils.makeInvisible
-import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.databinding.FragmentAddItemBinding
 import com.erdees.toyswap.databinding.PictureGridItemBinding
-import com.erdees.toyswap.databinding.PictureGridMarginBinding
 import com.erdees.toyswap.model.models.item.ItemCategory
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
 import com.erdees.toyswap.view.fragments.dialogs.PicturePreviewDialog
 import com.erdees.toyswap.viewModel.AddItemFragmentViewModel
 import com.theartofdev.edmodo.cropper.CropImage
+
 
 class AddItemFragment : Fragment() {
 
@@ -72,6 +70,7 @@ class AddItemFragment : Fragment() {
         })
 
         viewModel.picturesLiveData.observe(viewLifecycleOwner, { picList ->
+            binding.itemAddPictureBtn.isEnabled = picList.size < 6
             buildPictureGridLayout(picList)
         })
 
@@ -118,34 +117,12 @@ class AddItemFragment : Fragment() {
     }
 
 
-    private fun addEachMargin(index : Int){
-        val eachMargin = LayoutInflater.from(requireContext()).inflate(R.layout.picture_grid_margin,null,false)
-        val marginBinding = PictureGridMarginBinding.bind(eachMargin)
-        binding.addItemPicturesLayout.addView(eachMargin) // ADDING MARGIN MANUALLY AS A VIEW BEFORE EACH LAYOUT TO DETECT WHERE DRAG AND DROP ENDED!
-            Log.i(TAG,"Margin of index $index x: ${eachMargin.x} y: ${eachMargin.y}  pos: $eachMargin.")
-        eachMargin.setOnDragListener { v, event ->
-            val action = event.action
-            when(action) {
-                DragEvent.ACTION_DROP -> {
-                    Log.i(TAG, "DROPPED IN $index margin!!!")
-                    viewModel.rearrangePictures(indexOfMovedElement, index)
-                }
-                DragEvent.ACTION_DRAG_ENTERED -> {
-                    marginBinding.pictureGridMarginRow.makeVisible()
-                }
-                DragEvent.ACTION_DRAG_EXITED -> {
-                    marginBinding.pictureGridMarginRow.makeInvisible()
-                }
-                }
-            return@setOnDragListener true
-        }
-    }
-
-
-   private fun View.setMargins(topMargin : Int,bottomMargin : Int) {
+   private fun View.setMargins(topMargin : Int,bottomMargin : Int,leftMargin : Int, rightMargin : Int) {
        val layoutParams = GridLayout.LayoutParams()
        layoutParams.topMargin = topMargin
        layoutParams.bottomMargin = bottomMargin
+       layoutParams.leftMargin = leftMargin
+       layoutParams.rightMargin = rightMargin
        this.layoutParams = layoutParams
    }
 
@@ -181,7 +158,6 @@ class AddItemFragment : Fragment() {
     private fun PictureGridItemBinding.setLayoutTouchListener(picList: List<Uri>,eachPic: Uri){
         this.gridItemLayout.setOnTouchListener { view, event ->
             val indexOfElement = picList.indexOf(eachPic)
-            //TODO WHEN THIS IS BEING DRAGGED IT'S MARGINS SHOULD BE GONE FOR THE TIME OF DRAGGIN.
             indexOfMovedElement = indexOfElement
             val action = event.action
             when (action) {
@@ -204,34 +180,22 @@ class AddItemFragment : Fragment() {
         }
     }
 
-    private fun PictureGridItemBinding.setLayoutDragListener(picList: List<Uri>){
+    private fun PictureGridItemBinding.setLayoutDragListener(picList: List<Uri>,eachPic: Uri){
+        val index = picList.indexOf(eachPic)
         this.gridItemLayout.setOnDragListener { v, event ->
             val action = event.action
             when (action) {
-                DragEvent.ACTION_DRAG_STARTED -> {
-                    Log.i(TAG, "START DRAGGIN")
-                }
                 DragEvent.ACTION_DRAG_ENDED -> {
                     Log.i(TAG,"LOC: x: ${event.x} , y: ${event.y} ")
                     Handler(Looper.getMainLooper()).post {
                         buildPictureGridLayout(picList)
                     }
-                    //  buildPictureGridLayout(picList)//  this causes crash if I drop item inside grid layout
-                    Log.i(TAG, "END DRAGGIN")
                 }
-                DragEvent.ACTION_DROP -> { // TODO THIS SHOULD DETECT BETWEEN WHICH ITEMS IN GRID THIS VIEW WAS DROPPED AND THEN CALL CustomListRearranger on list of items through view model.
-                    // THIS IS CALLED ONLY WHEN I DROP ITEM TO ANOTHER ITEM FROM SAME GRID!!!
-                    Log.i(TAG, "DRAGGIN DROP")
-                }
-                DragEvent.ACTION_DRAG_LOCATION -> {
-                    Log.i(TAG,"LOC: x: ${event.x} , y: ${event.y} ")
-                }
-                DragEvent.ACTION_DRAG_ENTERED -> {
-                    Log.i(TAG, "DRAG ENTERED!")
+                DragEvent.ACTION_DROP -> {
+                    viewModel.rearrangePictures(indexOfMovedElement, index)
                 }
                 else -> Log.i(TAG,"DRAGGIN ELSEEE!! $action")
             }
-
             return@setOnDragListener true
         }
     }
@@ -242,12 +206,13 @@ class AddItemFragment : Fragment() {
             LayoutInflater.from(requireContext())
                 .inflate(R.layout.picture_grid_item, null, false)
         val thisBinding = PictureGridItemBinding.bind(eachPictureCard)
-        eachPictureCard.setMargins(6,6)
+        eachPictureCard.setMargins(12,12,16,16)
         thisBinding.setUp(eachPic,picList)
         thisBinding.setPictureTouchListener(eachPic)
-        thisBinding.setLayoutTouchListener(picList,eachPic)
-        thisBinding.setLayoutDragListener(picList)
-
+        if(picList.size > 1) {
+            thisBinding.setLayoutTouchListener(picList, eachPic)
+            thisBinding.setLayoutDragListener(picList, eachPic)
+        }
         thisBinding.gridRemovePicBtn.setOnClickListener {
             viewModel.removePicture(eachPic)
         }
@@ -258,10 +223,7 @@ class AddItemFragment : Fragment() {
     private fun buildPictureGridLayout(picList : List<Uri>) {
         binding.addItemPicturesLayout.removeAllViews()
         for (eachPic in picList) {
-            val indexOfEachPic = picList.indexOf(eachPic) // Index is important to keep track of margins.
-            addEachMargin(indexOfEachPic)
             addEachPictureCard(picList, eachPic)
-            if(eachPic == picList.last()) addEachMargin(indexOfEachPic)
         }
     }
 
