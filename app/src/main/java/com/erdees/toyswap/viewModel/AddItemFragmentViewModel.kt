@@ -17,6 +17,8 @@ class AddItemFragmentViewModel: ViewModel() {
 
     fun removePicture(uri: Uri) = picturesRepository.removePicture(uri)
 
+    fun rearrangePictures(indexOfElementToMove: Int, finalIndexOfElement: Int) = picturesRepository.rearrangePictures(indexOfElementToMove,finalIndexOfElement)
+
     fun clearPicturesData() = picturesRepository.clearPicturesData()
 
     val picturesLiveData = picturesRepository.getPicturesLiveData()

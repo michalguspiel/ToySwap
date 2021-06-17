@@ -2,10 +2,11 @@ package com.erdees.toyswap.model.repositories
 
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
+import com.erdees.toyswap.model.CustomListRearranger.rearrange
 
 class PicturesRepository {
 
-    private val pictures = mutableListOf<Uri>()
+    private var pictures = mutableListOf<Uri>()
     private val picturesLiveData : MutableLiveData<List<Uri>> = MutableLiveData()
 
     init {
@@ -26,6 +27,12 @@ class PicturesRepository {
 
     fun clearPicturesData(){
         pictures.clear()
+        picturesLiveData.value = pictures
+    }
+
+    fun rearrangePictures(indexOfElementToMove: Int, finalIndexOfElement: Int)  {
+       val rearrangeList = pictures.rearrange(indexOfElementToMove,finalIndexOfElement) as MutableList<Uri>
+        pictures = rearrangeList
         picturesLiveData.value = pictures
     }
 
