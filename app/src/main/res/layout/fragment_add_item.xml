@@ -121,6 +121,8 @@
             app:layout_constraintTop_toBottomOf="@id/itemChooseCategoryBtn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:animateLayoutChanges="true"
+
             android:useDefaultMargins="false"
             android:columnCount="3"
             android:rowCount="2"
@@ -137,7 +139,7 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
-            android:id="@+id/addItemButton"
+            android:id="@+id/submitItemButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
