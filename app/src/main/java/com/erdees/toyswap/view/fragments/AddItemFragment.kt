@@ -24,7 +24,11 @@ import com.erdees.toyswap.databinding.PictureGridItemBinding
 import com.erdees.toyswap.model.models.item.ItemCategory
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
 import com.erdees.toyswap.view.fragments.dialogs.PicturePreviewDialog
+import com.erdees.toyswap.viewModel.AddItemAndroidViewModel
 import com.erdees.toyswap.viewModel.AddItemFragmentViewModel
+import com.google.android.gms.tasks.Task
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
 import com.theartofdev.edmodo.cropper.CropImage
 
 
@@ -34,16 +38,18 @@ class AddItemFragment : Fragment() {
     private var _binding: FragmentAddItemBinding? = null
     private val binding get() = _binding!!
 
-    private var indexOfMovedElement: Int = 999 // changed during app run
+    private var indexOfMovedElement: Int = 0 // changed during app run TODO make it RX
     private lateinit var pickedCategory: ItemCategory
 
     private lateinit var picturePreview: PicturePreviewDialog
 
     private lateinit var viewModel: AddItemFragmentViewModel
+    private lateinit var androidViewModel: AddItemAndroidViewModel
 
     private val chooseCategoryDialog by lazy {
         ChooseCategoryDialog.newInstance()
     }
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -54,18 +60,18 @@ class AddItemFragment : Fragment() {
 
         val view = binding.root
         viewModel = ViewModelProvider(this).get(AddItemFragmentViewModel::class.java)
-
+        androidViewModel = ViewModelProvider(this).get(AddItemAndroidViewModel::class.java)
 
         viewModel.categoryLiveData.observe(viewLifecycleOwner, {
             if (it != null) {
                 Log.i(TAG, it.categoryName)
                 pickedCategory = it
                 binding.itemChosenCategory.text = it.categoryName
-                binding.itemChooseCategoryBtn.text = "Change category"
+                binding.itemChooseCategoryBtn.text = getString(R.string.change_category)
             }
             if (it == null) {
                 binding.itemChosenCategory.text = ""
-                binding.itemChooseCategoryBtn.text = "Pick category"
+                binding.itemChooseCategoryBtn.text = getString(R.string.pick_category)
             }
         })
 
@@ -82,9 +88,59 @@ class AddItemFragment : Fragment() {
             openGalleryForImage()
         }
 
+        binding.submitItemButton.setOnClickListener {
+            viewModel.addPicturesToCloud()
+            // showLoadingDialog()
+            viewModel.getUriOfPicsInCloudLiveData().observe(viewLifecycleOwner, { cloudUriList ->
+                viewModel.picturesLiveData.observe(viewLifecycleOwner, { clientUriList ->
+                    if (cloudUriList.size == clientUriList.size &&
+                        cloudUriList.isNotEmpty() &&
+                        clientUriList.isNotEmpty()
+                    ) addThisItemToFirebase().addOnSuccessListener {
+                        Log.i(TAG, "ITEM ADDED SUCCESSFULLY !!!")
+                        viewModel.clearPicturesData()
+                        //endLoadingDialogAndContinue()
+                        // meybe show item page or Show all user items
+                    }
+                        .addOnFailureListener {
+                            Log.i(TAG, "ITEM ADDING FAILED!")
+                        }
+                })
+            })
+            /**pseudocode
+             *
+             * upload pics to firebase storage, save their urls
+             * showLoadingDialog
+             *
+             * once viewModel.cloudPicturesUriLive equals size of clientPicturesUri  [uploading finished]
+             *
+             * add item to firebase
+             *once item added succesfully clear client Pics and clientCloudPicturesUriLive
+             * Close loading dialog
+             * show item page??? or stay in this fragment idk yet
+             *
+             *
+             * */
+        }
+
+
         return view
     }
 
+    private fun addThisItemToFirebase(): Task<DocumentReference> {
+        return viewModel.addItemToFirebase(
+            binding.itemNameInput.text.toString(),
+            pickedCategory,
+            binding.itemDescInput.text.toString(),
+            binding.itemPriceInput.text.toString().toDouble(),
+            null,
+            null,
+            Timestamp.now(),
+            androidViewModel.getUserId()!!
+        )
+    }
+
+    /**FOR NOW THIS CANNOT BE CHANGED SINCE CROPPER LIBRARY DOESN'T WORK WITH [registerForActivityResult]*/
     private fun openGalleryForImage() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
@@ -117,25 +173,30 @@ class AddItemFragment : Fragment() {
     }
 
 
-   private fun View.setMargins(topMargin : Int,bottomMargin : Int,leftMargin : Int, rightMargin : Int) {
-       val layoutParams = GridLayout.LayoutParams()
-       layoutParams.topMargin = topMargin
-       layoutParams.bottomMargin = bottomMargin
-       layoutParams.leftMargin = leftMargin
-       layoutParams.rightMargin = rightMargin
-       this.layoutParams = layoutParams
-   }
+    private fun View.setMargins(
+        topMargin: Int,
+        bottomMargin: Int,
+        leftMargin: Int,
+        rightMargin: Int
+    ) {
+        val layoutParams = GridLayout.LayoutParams()
+        layoutParams.topMargin = topMargin
+        layoutParams.bottomMargin = bottomMargin
+        layoutParams.leftMargin = leftMargin
+        layoutParams.rightMargin = rightMargin
+        this.layoutParams = layoutParams
+    }
 
-    private fun PictureGridItemBinding.setUp(eachPic: Uri,picList: List<Uri>){
-        if (eachPic == picList.first()) this.gridItemHead.text = "Main picture"
+    private fun PictureGridItemBinding.setUp(eachPic: Uri, picList: List<Uri>) {
+        if (eachPic == picList.first()) this.gridItemHead.text = getString(R.string.main_picture)
         Glide.with(requireActivity())
             .load(eachPic)
             .into(this.gridItemPicture)
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun PictureGridItemBinding.setPictureTouchListener(eachPic : Uri){
-        this.gridItemPicture.setOnTouchListener { v, event ->
+    private fun PictureGridItemBinding.setPictureTouchListenerAsPicPreview(eachPic: Uri) {
+        this.gridItemPicture.setOnTouchListener { _, event ->
             val action = event.action
             binding.root.requestDisallowInterceptTouchEvent(true)
             when (action) {
@@ -155,12 +216,13 @@ class AddItemFragment : Fragment() {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun PictureGridItemBinding.setLayoutTouchListener(picList: List<Uri>,eachPic: Uri){
+    private fun PictureGridItemBinding.setLayoutTouchListenerAsItemDrag(
+        picList: List<Uri>,
+        eachPic: Uri
+    ) {
         this.gridItemLayout.setOnTouchListener { view, event ->
-            val indexOfElement = picList.indexOf(eachPic)
-            indexOfMovedElement = indexOfElement
-            val action = event.action
-            when (action) {
+            indexOfMovedElement = picList.indexOf(eachPic)
+            when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     val data = ClipData.newPlainText("", "")
                     val shadowBuilder = View.DragShadowBuilder(view)
@@ -172,21 +234,18 @@ class AddItemFragment : Fragment() {
                     view.makeGone()
                     return@setOnTouchListener true
                 }
-                else ->{
-                    Log.i(TAG, " Motion ACTION  ELSE! ${action}")
+                else -> {
                     return@setOnTouchListener true
                 }
             }
         }
     }
 
-    private fun PictureGridItemBinding.setLayoutDragListener(picList: List<Uri>,eachPic: Uri){
+    private fun PictureGridItemBinding.setLayoutDragListener(picList: List<Uri>, eachPic: Uri) {
         val index = picList.indexOf(eachPic)
-        this.gridItemLayout.setOnDragListener { v, event ->
-            val action = event.action
-            when (action) {
+        this.gridItemLayout.setOnDragListener { _, event ->
+            when (event.action) {
                 DragEvent.ACTION_DRAG_ENDED -> {
-                    Log.i(TAG,"LOC: x: ${event.x} , y: ${event.y} ")
                     Handler(Looper.getMainLooper()).post {
                         buildPictureGridLayout(picList)
                     }
@@ -194,23 +253,24 @@ class AddItemFragment : Fragment() {
                 DragEvent.ACTION_DROP -> {
                     viewModel.rearrangePictures(indexOfMovedElement, index)
                 }
-                else -> Log.i(TAG,"DRAGGIN ELSEEE!! $action")
+                else -> {
+                }
             }
             return@setOnDragListener true
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun addEachPictureCard(picList: List<Uri>, eachPic : Uri) {
+    private fun addEachPictureCard(picList: List<Uri>, eachPic: Uri) {
         val eachPictureCard =
             LayoutInflater.from(requireContext())
                 .inflate(R.layout.picture_grid_item, null, false)
         val thisBinding = PictureGridItemBinding.bind(eachPictureCard)
-        eachPictureCard.setMargins(12,12,16,16)
-        thisBinding.setUp(eachPic,picList)
-        thisBinding.setPictureTouchListener(eachPic)
-        if(picList.size > 1) {
-            thisBinding.setLayoutTouchListener(picList, eachPic)
+        eachPictureCard.setMargins(12, 12, 16, 16)
+        thisBinding.setUp(eachPic, picList)
+        thisBinding.setPictureTouchListenerAsPicPreview(eachPic)
+        if (picList.size > 1) { // SO THERE'S NO DRAGGING OPTION FOR ONE ITEM
+            thisBinding.setLayoutTouchListenerAsItemDrag(picList, eachPic)
             thisBinding.setLayoutDragListener(picList, eachPic)
         }
         thisBinding.gridRemovePicBtn.setOnClickListener {
@@ -220,7 +280,7 @@ class AddItemFragment : Fragment() {
     }
 
 
-    private fun buildPictureGridLayout(picList : List<Uri>) {
+    private fun buildPictureGridLayout(picList: List<Uri>) {
         binding.addItemPicturesLayout.removeAllViews()
         for (eachPic in picList) {
             addEachPictureCard(picList, eachPic)
