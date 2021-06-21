@@ -133,8 +133,6 @@ class AddItemFragment : Fragment() {
             pickedCategory,
             binding.itemDescInput.text.toString(),
             binding.itemPriceInput.text.toString().toDouble(),
-            null,
-            null,
             Timestamp.now(),
             androidViewModel.getUserId()!!
         )

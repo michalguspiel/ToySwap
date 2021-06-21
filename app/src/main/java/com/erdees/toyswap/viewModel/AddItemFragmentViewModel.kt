@@ -38,8 +38,6 @@ class AddItemFragmentViewModel : ViewModel() {
 
     val picturesLiveData = picturesRepository.getPicturesLiveData()
 
-    fun addPicUri(uri: Uri) = picturesRepository.addPicUri(uri)
-
     fun getUriOfPicsInCloudLiveData() = picturesRepository.getUriOfPicsInCloudLiveData()
 
     fun addPicturesToCloud() = picturesRepository.addPicturesToCloud()
@@ -49,18 +47,19 @@ class AddItemFragmentViewModel : ViewModel() {
         category: ItemCategory,
         desc: String,
         price: Double,
-        mainImage: String?,
-        otherImages: List<String>?,
         timeStamp: Timestamp,
         userId: String
-    ) : Task<DocumentReference> = itemRepository.addItemToFirebase(Item(name,
-        category.documentRef(),
-        desc,
-        price,
-        getUriOfPicsInCloudLiveData().value!!.first().toString(),
-        getUriOfPicsInCloudLiveData().value!!.drop(1).map {it.toString()},
-        timeStamp,
-        userId))
-
-
+    ) : Task<DocumentReference> {
+        val mainPic =
+            getUriOfPicsInCloudLiveData().value?.first { it.first == 0 }?.second.toString() // MAIN PIC MUST EXIST
+        val otherPics = getUriOfPicsInCloudLiveData().value!!.filter{it.first != 0}.sortedBy{it.first}.map {it.second.toString()}
+       return itemRepository.addItemToFirebase(Item(name,
+            category.documentRef(),
+            desc,
+            price,
+            mainPic,
+            otherPics,
+            timeStamp,
+            userId))
+    }
 }
