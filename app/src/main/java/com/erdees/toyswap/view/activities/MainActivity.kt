@@ -13,7 +13,6 @@ import com.erdees.toyswap.view.fragments.ChatFragment
 import com.erdees.toyswap.view.fragments.MyAccountFragment
 import com.erdees.toyswap.viewModel.MainActivityViewModel
 import com.google.firebase.auth.FirebaseUser
-import dagger.hilt.android.AndroidEntryPoint
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +27,11 @@ class MainActivity : AppCompatActivity() {
 
     private var currentUser: FirebaseUser? = null
     private var isUserLoggedOut : Boolean = false
+
+    override fun onBackPressed() {
+        if(this.supportFragmentManager.backStackEntryCount == 1) this.finish()
+        else super.onBackPressed()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
