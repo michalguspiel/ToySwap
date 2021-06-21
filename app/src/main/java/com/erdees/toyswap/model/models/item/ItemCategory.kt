@@ -9,11 +9,11 @@ open class ItemCategory (
     val categoryName : String = "",
     val parent : ItemCategory? = null,
     val children : List<ItemCategory>? = null,
-    val icon: Icon? = null
+    val icon: Icon? = null,
+    val docName : String = ""
 ) {
 
-    fun documentRef() : DocumentReference = Firebase.firestore.document("itemCategories/${this.toString()}")
-
+    fun documentRef() : DocumentReference = Firebase.firestore.document("itemCategories/${this.docName}")
 }
 
 
