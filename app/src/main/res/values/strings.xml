@@ -10,4 +10,8 @@
     <string name="street">Street</string>
     <string name="submit">Submit</string>
     <string name="choose_category">Choose category</string>
+    <string name="change_category">Change category</string>
+    <string name="pick_category">Pick category</string>
+    <string name="main_picture">Main picture</string>
+    <string name="provideAllData">You must provide all necessary data.</string>
 </resources>

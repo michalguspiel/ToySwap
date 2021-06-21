@@ -5,6 +5,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.paging.PagedList
 import com.erdees.toyswap.model.models.item.Item
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -29,6 +31,10 @@ class ItemDao {
             .setLifecycleOwner(viewLifecycleOwner)
             .setQuery(query, config, Item::class.java)
             .build()
+    }
+
+    fun addItemToFirebase(Item: Item): Task<DocumentReference> {
+       return db.collection("items").add(Item)
     }
 
 

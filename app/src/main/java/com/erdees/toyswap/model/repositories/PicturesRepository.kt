@@ -1,16 +1,59 @@
 package com.erdees.toyswap.model.repositories
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.erdees.toyswap.model.CustomListRearranger.rearrange
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
+import java.util.*
 
 class PicturesRepository {
 
     private var pictures = mutableListOf<Uri>()
     private val picturesLiveData : MutableLiveData<List<Uri>> = MutableLiveData()
 
+    private var uriOfPicsInCloud = mutableListOf<Pair<Int,Uri>>()
+    private val uriOfPicsInCloudLive : MutableLiveData<List<Pair<Int,Uri>>> = MutableLiveData()
+
+
+    private val firebaseStorage : FirebaseStorage = Firebase.storage
+    private val storageRef = firebaseStorage.reference
+    private val itemsPictureRef = storageRef.child("itemPictures/")
+
     init {
         picturesLiveData.value = pictures
+        uriOfPicsInCloudLive.value = uriOfPicsInCloud
+    }
+
+
+    fun addPicturesToCloud() {
+        picturesLiveData.value?.forEach { eachPicUri ->
+            val indexOfThisPic = picturesLiveData.value!!.indexOf(eachPicUri)
+            val generatedPicId = UUID.randomUUID()
+            val docRef = itemsPictureRef.child(generatedPicId.toString())
+            docRef.putFile(eachPicUri).addOnSuccessListener {
+                Log.i(TAG,"1stSuccess")
+                docRef.downloadUrl.addOnSuccessListener {  uri ->
+                    Log.i(TAG,"2ndSuccess")
+                    addPicUri(indexOfThisPic,uri)
+                }
+                    .addOnFailureListener { Log.i(TAG,"FAIL DOWNLOAD URI") }
+            }.addOnFailureListener { Log.i(TAG,"ERRRROR") }
+        }
+    }
+
+    fun getUriOfPicsInCloudLiveData() = uriOfPicsInCloudLive
+
+    private fun addPicUri(indexOfThisPic : Int,uri: Uri){
+        uriOfPicsInCloud.add(Pair(indexOfThisPic,uri))
+        uriOfPicsInCloudLive.value = uriOfPicsInCloud
+    }
+
+    private fun clearUriOfPicsInCloudData(){
+        uriOfPicsInCloud.clear()
+        uriOfPicsInCloudLive.value = uriOfPicsInCloud
     }
 
     fun getPicturesLiveData() = picturesLiveData
@@ -28,6 +71,7 @@ class PicturesRepository {
     fun clearPicturesData(){
         pictures.clear()
         picturesLiveData.value = pictures
+        clearUriOfPicsInCloudData()
     }
 
     fun rearrangePictures(indexOfElementToMove: Int, finalIndexOfElement: Int)  {
@@ -44,6 +88,7 @@ class PicturesRepository {
             instance
                 ?: PicturesRepository().also {  instance = it}
         }
+        const val TAG = "PicRepo"
     }
 
 }

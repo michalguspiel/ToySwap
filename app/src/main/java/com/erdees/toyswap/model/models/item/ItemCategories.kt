@@ -7,25 +7,25 @@ package com.erdees.toyswap.model.models.item
  * */
 
 class ItemCategories {
-    object MainCategory : ItemCategory("Category",null,listOf(Kids, Sports))
+    object MainCategory : ItemCategory("Category",null,listOf(Kids, Sports),docName = "category")
     /**Main Categories*/
-    object Kids : ItemCategory("Kids", MainCategory, listOf(Toys))
-    object Sports : ItemCategory("Sport",MainCategory, listOf(Bikes, Teamsports, Individualsports))
+    object Kids : ItemCategory("Kids", MainCategory, listOf(Toys),docName = "kids")
+    object Sports : ItemCategory("Sport",MainCategory, listOf(Bikes, Teamsports, Individualsports),docName = "sports")
     /**Sub Categories*/
-    object Bikes : ItemCategory("Bikes", Sports, listOf(AdultBikes, KidsBikes))
-    object Teamsports : ItemCategory("Team sports", Sports, null)
-    object Individualsports : ItemCategory("Individual sports", Sports, null)
-    object Toys : ItemCategory("Toys", Kids, listOf(Cars, Dolls))
+    object Bikes : ItemCategory("Bikes", Sports, listOf(AdultBikes, KidsBikes),docName = "bikes")
+    object Teamsports : ItemCategory("Team sports", Sports, null,docName = "teamSports")
+    object Individualsports : ItemCategory("Individual sports", Sports, null,docName = "individualSports")
+    object Toys : ItemCategory("Toys", Kids, listOf(Cars, Dolls),docName = "toys")
 
     /**Children categories*/
-    object Dolls : ItemCategory("Dolls", Toys, null)
-    object Cars : ItemCategory("Cars", Toys, null)
+    object Dolls : ItemCategory("Dolls", Toys, null,docName = "dolls")
+    object Cars : ItemCategory("Cars", Toys, null,docName = "cars")
 
-    object AdultBikes : ItemCategory("Adult bikes", Bikes,listOf(MountainBike))
-    object KidsBikes : ItemCategory("Kids bikes", Bikes,null)
+    object AdultBikes : ItemCategory("Adult bikes", Bikes,listOf(MountainBike),docName = "adultBikes")
+    object KidsBikes : ItemCategory("Kids bikes", Bikes,null,docName = "kidsBikes")
 
 
-    object MountainBike : ItemCategory("Mountain Bikes",Bikes,null)
+    object MountainBike : ItemCategory("Mountain Bikes",Bikes,null,docName = "mountainBikes")
 
 
     var currentCategory: ItemCategory = MainCategory

@@ -104,6 +104,9 @@ dependencies {
     // Annotation processor
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
 
+    //RX Kotlin
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
+
     /**IMAGE CROPPER*/
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
 
@@ -124,7 +127,7 @@ dependencies {
     testImplementation "org.powermock:powermock-classloading-xstream:1.6.2"
     // - Test helper for LiveData
     testImplementation("androidx.arch.core:core-testing:$arch_version")
-
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.21.0'
 
 
 

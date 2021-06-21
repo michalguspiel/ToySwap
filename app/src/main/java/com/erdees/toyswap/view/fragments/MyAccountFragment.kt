@@ -22,7 +22,6 @@ import com.erdees.toyswap.Utils.launchImageCrop
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
-import com.erdees.toyswap.model.models.ClientUser
 import com.erdees.toyswap.view.activities.MainActivity
 import com.erdees.toyswap.view.fragments.dialogs.ChangeAddressDialog
 import com.erdees.toyswap.view.fragments.dialogs.ChangeNameDialog
@@ -38,7 +37,6 @@ class MyAccountFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var user: FirebaseUser
-    private lateinit var thisClientUser: ClientUser
 
     private lateinit var viewModel: MyAccountFragmentViewModel
     private lateinit var view: ScrollView
