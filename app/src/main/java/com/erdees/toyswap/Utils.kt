@@ -2,6 +2,7 @@ package com.erdees.toyswap
 
 import android.content.Context
 import android.net.Uri
+import android.text.Editable
 import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
+import io.reactivex.rxjava3.subjects.PublishSubject
 
 object Utils {
 
@@ -107,5 +109,10 @@ object Utils {
         this.isEnabled = true
     }
 
+
+
+    fun PublishSubject<Boolean>.postRxValueBasedOnEditText(editable: Editable) {
+        if(editable.isBlank()) this.onNext(false) else this.onNext(true)
+    }
 
 }
