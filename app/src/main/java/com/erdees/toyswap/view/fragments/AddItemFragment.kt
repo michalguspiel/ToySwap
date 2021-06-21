@@ -2,6 +2,7 @@ package com.erdees.toyswap.view.fragments
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
@@ -11,25 +12,27 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.widget.GridLayout
+import android.widget.ProgressBar
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.erdees.toyswap.Constants
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
+import com.erdees.toyswap.Utils.disable
+import com.erdees.toyswap.Utils.enable
 import com.erdees.toyswap.Utils.makeGone
+import com.erdees.toyswap.Utils.setMargins
 import com.erdees.toyswap.databinding.FragmentAddItemBinding
 import com.erdees.toyswap.databinding.PictureGridItemBinding
-import com.erdees.toyswap.model.models.item.ItemCategory
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
 import com.erdees.toyswap.view.fragments.dialogs.PicturePreviewDialog
-import com.erdees.toyswap.viewModel.AddItemAndroidViewModel
 import com.erdees.toyswap.viewModel.AddItemFragmentViewModel
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.theartofdev.edmodo.cropper.CropImage
+import io.reactivex.rxjava3.subjects.PublishSubject
 
 
 class AddItemFragment : Fragment() {
@@ -38,18 +41,29 @@ class AddItemFragment : Fragment() {
     private var _binding: FragmentAddItemBinding? = null
     private val binding get() = _binding!!
 
-    private var indexOfMovedElement: Int = 0 // changed during app run TODO make it RX
-    private lateinit var pickedCategory: ItemCategory
+    private var indexOfMovedElement: Int = 0
 
     private lateinit var picturePreview: PicturePreviewDialog
 
     private lateinit var viewModel: AddItemFragmentViewModel
-    private lateinit var androidViewModel: AddItemAndroidViewModel
+
+    private lateinit var alertDialog: AlertDialog
 
     private val chooseCategoryDialog by lazy {
         ChooseCategoryDialog.newInstance()
     }
 
+    private val isPictureProvidedRX = PublishSubject.create<Boolean>()
+    private val isCategoryProvidedRX = PublishSubject.create<Boolean>()
+    private val isNameProvidedRX = PublishSubject.create<Boolean>()
+    private val isDescProvidedRX = PublishSubject.create<Boolean>()
+    private val isPriceProvidedRX = PublishSubject.create<Boolean>()
+
+    private var isPictureProvided = false
+    private var isCategoryProvided = false
+    private var isNameProvided = false
+    private var isDescProvided = false
+    private var isPriceProvided = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -57,25 +71,29 @@ class AddItemFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAddItemBinding.inflate(inflater, container, false)
-
         val view = binding.root
         viewModel = ViewModelProvider(this).get(AddItemFragmentViewModel::class.java)
-        androidViewModel = ViewModelProvider(this).get(AddItemAndroidViewModel::class.java)
+
+        ifAllDataIsProvidedEnableSubmitButton()
 
         viewModel.categoryLiveData.observe(viewLifecycleOwner, {
             if (it != null) {
-                Log.i(TAG, it.categoryName)
-                pickedCategory = it
+                Log.i(TAG, "Picked category  = ${it.categoryName}")
                 binding.itemChosenCategory.text = it.categoryName
                 binding.itemChooseCategoryBtn.text = getString(R.string.change_category)
+                isCategoryProvidedRX.onNext(true)
             }
             if (it == null) {
+                isCategoryProvidedRX.onNext(false)
                 binding.itemChosenCategory.text = ""
                 binding.itemChooseCategoryBtn.text = getString(R.string.pick_category)
             }
         })
 
         viewModel.picturesLiveData.observe(viewLifecycleOwner, { picList ->
+            if (picList.isNotEmpty()) isPictureProvidedRX.onNext(true) else isPictureProvidedRX.onNext(
+                false
+            )
             binding.itemAddPictureBtn.isEnabled = picList.size < 6
             buildPictureGridLayout(picList)
         })
@@ -88,53 +106,139 @@ class AddItemFragment : Fragment() {
             openGalleryForImage()
         }
 
+        binding.itemNameInput.addTextChangedListener {
+            if (it.isNullOrBlank()) isNameProvidedRX.onNext(false) else isNameProvidedRX.onNext(true)
+        }
+        binding.itemDescInput.addTextChangedListener {
+            if (it.isNullOrBlank()) isDescProvidedRX.onNext(false) else isDescProvidedRX.onNext(true)
+        }
+        binding.itemPriceInput.addTextChangedListener {
+            if (it.isNullOrBlank()) isPriceProvidedRX.onNext(false) else isPriceProvidedRX.onNext(
+                true
+            )
+        }
+
         binding.submitItemButton.setOnClickListener {
             viewModel.addPicturesToCloud()
-            // showLoadingDialog()
+            showLoadingDialog()
             viewModel.getUriOfPicsInCloudLiveData().observe(viewLifecycleOwner, { cloudUriList ->
                 viewModel.picturesLiveData.observe(viewLifecycleOwner, { clientUriList ->
                     if (cloudUriList.size == clientUriList.size &&
                         cloudUriList.isNotEmpty() &&
                         clientUriList.isNotEmpty()
                     ) addThisItemToFirebase().addOnSuccessListener {
-                        Log.i(TAG, "ITEM ADDED SUCCESSFULLY !!!")
+                        Log.i(TAG, "Item added succesfully!")
                         viewModel.clearPicturesData()
-                        //endLoadingDialogAndContinue()
-                        // meybe show item page or Show all user items
+                        endLoadingAndContinue()
                     }
                         .addOnFailureListener {
-                            Log.i(TAG, "ITEM ADDING FAILED!")
+                            Log.i(TAG, "Item adding failed, handle error here.")
+                            endLoadingAndShowFailureDialog()
                         }
                 })
             })
-            /**pseudocode
-             *
-             * upload pics to firebase storage, save their urls
-             * showLoadingDialog
-             *
-             * once viewModel.cloudPicturesUriLive equals size of clientPicturesUri  [uploading finished]
-             *
-             * add item to firebase
-             *once item added succesfully clear client Pics and clientCloudPicturesUriLive
-             * Close loading dialog
-             * show item page??? or stay in this fragment idk yet
-             *
-             *
-             * */
+        }
+
+        isPictureProvidedRX.subscribe {
+            isPictureProvided = it
+            ifAllDataIsProvidedEnableSubmitButton()
+        }
+        isCategoryProvidedRX.subscribe {
+            isCategoryProvided = it
+            ifAllDataIsProvidedEnableSubmitButton()
+        }
+        isNameProvidedRX.subscribe {
+            isNameProvided = it
+            ifAllDataIsProvidedEnableSubmitButton()
+        }
+        isPriceProvidedRX.subscribe {
+            isPriceProvided = it
+            ifAllDataIsProvidedEnableSubmitButton()
+        }
+        isDescProvidedRX.subscribe {
+            isDescProvided = it
+            ifAllDataIsProvidedEnableSubmitButton()
         }
 
 
         return view
     }
 
+    private fun showLoadingDialog(){
+        alertDialog = AlertDialog.Builder(requireContext())
+            .setView(ProgressBar(requireContext()))
+            .setMessage("Adding your item...")
+            .show()
+    }
+
+    private fun showSuccessDialog(){
+        alertDialog = AlertDialog.Builder(requireContext())
+            .setMessage("Your item was added successfully!")
+            .setNegativeButton("Back",null)
+            .show()
+    }
+
+    private fun endLoadingAndShowFailureDialog(){
+        alertDialog = AlertDialog.Builder(requireContext())
+            .setMessage("Oops.. something went wrong your item wasn't added.")
+            .setNegativeButton("Back",null)
+            .show()
+    }
+
+    private fun endLoadingAndContinue(){
+        endLoading()
+        clearAddedItemData()
+        showSuccessDialog()
+    }
+
+    private fun clearAddedItemData(){
+        binding.itemNameInput.text?.clear()
+        binding.itemDescInput.text?.clear()
+        binding.itemPriceInput.text?.clear()
+        viewModel.clearCategory()
+    }
+
+    private fun endLoading(){
+        alertDialog.dismiss()
+    }
+
+    private fun ifAllDataIsProvidedEnableSubmitButton() {
+        if (isPictureProvided && isCategoryProvided && isNameProvided && isPriceProvided && isDescProvided){
+            binding.submitItemButton.enable()
+            clearErrorTextView()
+        }
+        else {
+            binding.submitItemButton.disable()
+            setSubmitErrorTextView()
+        }
+    }
+
+    private fun clearErrorTextView(){
+        binding.submitErrorTextView.text = ""
+    }
+
+    private fun setSubmitErrorTextView(){
+        val list = listOf(isNameProvided,isDescProvided,isPriceProvided,isPictureProvided,isCategoryProvided).filter { !it }
+        if(list.size > 1) binding.submitErrorTextView.text = getString(R.string.provideAllData)
+        else binding.submitErrorTextView.text = findErrorMessage()
+    }
+
+    private fun findErrorMessage(): String{
+        return when{
+            !isNameProvided -> "Item name must be provided."
+            !isDescProvided -> "Item description must be provided."
+            !isPriceProvided -> "Item price must be provided."
+            !isPictureProvided -> "Item must have at least 1 picture."
+            !isCategoryProvided -> "Item must have category."
+            else -> ""
+        }
+    }
+
     private fun addThisItemToFirebase(): Task<DocumentReference> {
         return viewModel.addItemToFirebase(
             binding.itemNameInput.text.toString(),
-            pickedCategory,
             binding.itemDescInput.text.toString(),
             binding.itemPriceInput.text.toString().toDouble(),
-            Timestamp.now(),
-            androidViewModel.getUserId()!!
         )
     }
 
@@ -168,21 +272,6 @@ class AddItemFragment : Fragment() {
                 result.error
             }
         }
-    }
-
-
-    private fun View.setMargins(
-        topMargin: Int,
-        bottomMargin: Int,
-        leftMargin: Int,
-        rightMargin: Int
-    ) {
-        val layoutParams = GridLayout.LayoutParams()
-        layoutParams.topMargin = topMargin
-        layoutParams.bottomMargin = bottomMargin
-        layoutParams.leftMargin = leftMargin
-        layoutParams.rightMargin = rightMargin
-        this.layoutParams = layoutParams
     }
 
     private fun PictureGridItemBinding.setUp(eachPic: Uri, picList: List<Uri>) {

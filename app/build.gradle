@@ -104,6 +104,9 @@ dependencies {
     // Annotation processor
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
 
+    //RX Kotlin
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
+
     /**IMAGE CROPPER*/
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
 

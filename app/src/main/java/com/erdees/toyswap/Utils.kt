@@ -5,6 +5,7 @@ import android.net.Uri
 import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup
+import android.widget.GridLayout
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -82,5 +83,29 @@ object Utils {
             .setCropShape(CropImageView.CropShape.RECTANGLE)
             .start(context, fragment)
     }
+
+    fun View.setMargins(
+        topMargin: Int,
+        bottomMargin: Int,
+        leftMargin: Int,
+        rightMargin: Int
+    ) {
+        val layoutParams = GridLayout.LayoutParams()
+        layoutParams.topMargin = topMargin
+        layoutParams.bottomMargin = bottomMargin
+        layoutParams.leftMargin = leftMargin
+        layoutParams.rightMargin = rightMargin
+        this.layoutParams = layoutParams
+    }
+
+
+    fun View.disable(){
+        this.isEnabled = false
+    }
+
+    fun View.enable(){
+        this.isEnabled = true
+    }
+
 
 }
