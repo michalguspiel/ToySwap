@@ -14,8 +14,8 @@ class PicturesRepository {
     private var pictures = mutableListOf<Uri>()
     private val picturesLiveData : MutableLiveData<List<Uri>> = MutableLiveData()
 
-    private var uriOfPicsInCloud = mutableListOf<Uri>()
-    private val uriOfPicsInCloudLive : MutableLiveData<List<Uri>> = MutableLiveData()
+    private var uriOfPicsInCloud = mutableListOf<Pair<Int,Uri>>()
+    private val uriOfPicsInCloudLive : MutableLiveData<List<Pair<Int,Uri>>> = MutableLiveData()
 
 
     private val firebaseStorage : FirebaseStorage = Firebase.storage
@@ -30,13 +30,14 @@ class PicturesRepository {
 
     fun addPicturesToCloud() {
         picturesLiveData.value?.forEach { eachPicUri ->
+            val indexOfThisPic = picturesLiveData.value!!.indexOf(eachPicUri)
             val generatedPicId = UUID.randomUUID()
             val docRef = itemsPictureRef.child(generatedPicId.toString())
             docRef.putFile(eachPicUri).addOnSuccessListener {
                 Log.i(TAG,"1stSuccess")
                 docRef.downloadUrl.addOnSuccessListener {  uri ->
                     Log.i(TAG,"2ndSuccess")
-                    addPicUri(uri)
+                    addPicUri(indexOfThisPic,uri)
                 }
                     .addOnFailureListener { Log.i(TAG,"FAIL DOWNLOAD URI") }
             }.addOnFailureListener { Log.i(TAG,"ERRRROR") }
@@ -45,12 +46,12 @@ class PicturesRepository {
 
     fun getUriOfPicsInCloudLiveData() = uriOfPicsInCloudLive
 
-    fun addPicUri(uri: Uri){
-        uriOfPicsInCloud.add(uri)
+    private fun addPicUri(indexOfThisPic : Int,uri: Uri){
+        uriOfPicsInCloud.add(Pair(indexOfThisPic,uri))
         uriOfPicsInCloudLive.value = uriOfPicsInCloud
     }
 
-    fun clearUriOfPicsInCloudData(){
+    private fun clearUriOfPicsInCloudData(){
         uriOfPicsInCloud.clear()
         uriOfPicsInCloudLive.value = uriOfPicsInCloud
     }
