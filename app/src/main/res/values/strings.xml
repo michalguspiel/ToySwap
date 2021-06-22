@@ -14,4 +14,10 @@
     <string name="pick_category">Pick category</string>
     <string name="main_picture">Main picture</string>
     <string name="provideAllData">You must provide all necessary data.</string>
+    <string name="make_an_offer">Make an offer</string>
+    <string name="items_you_might_find_interesting">Items You might find interesting</string>
+    <string name="buy_with_delivery">Buy with delivery</string>
+    <string name="delivery_price">Delivery price:</string>
+    <string name="user_reputation">User reputation:</string>
+    <string name="seller_avatar">seller avatar</string>
 </resources>
