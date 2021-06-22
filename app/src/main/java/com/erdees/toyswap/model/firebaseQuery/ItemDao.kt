@@ -2,6 +2,7 @@ package com.erdees.toyswap.model.firebaseQuery
 
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.PagedList
 import com.erdees.toyswap.model.models.item.Item
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
@@ -13,11 +14,18 @@ import com.google.firebase.ktx.Firebase
 
 class ItemDao {
 
+    private var item : Item? = null
+    private val itemLiveData : MutableLiveData<Item?> = MutableLiveData<Item?>()
+
+    init {
+        itemLiveData.value = item
+    }
+
     private val db = Firebase.firestore
 
-    private val query = db.collection("items")
-      //  .orderBy("timeStamp", Query.Direction.ASCENDING)
-        .limit(10)
+    private val itemCollection = db.collection("items")
+
+    private val query = itemCollection.limit(10)
 
     private val config = PagedList.Config.Builder()
         .setEnablePlaceholders(false)
@@ -35,6 +43,13 @@ class ItemDao {
 
     fun addItemToFirebase(Item: Item): Task<DocumentReference> {
        return db.collection("items").add(Item)
+    }
+
+    fun getPresentedItem() = itemLiveData
+
+    fun setItemToPresent(itemToPresent: Item) {
+        item = itemToPresent
+        itemLiveData.value = item
     }
 
 

@@ -20,7 +20,7 @@ class ItemFragment : Fragment() {
         _binding = FragmentItemBinding.inflate(inflater,container,false)
         val view = binding.root
 
-       
+
 
         return view
     }
