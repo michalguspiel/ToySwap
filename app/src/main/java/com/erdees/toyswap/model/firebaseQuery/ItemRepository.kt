@@ -14,4 +14,8 @@ class ItemRepository(private val dao: ItemDao) {
 
     fun addItemToFirebase(item: Item):Task<DocumentReference> = dao.addItemToFirebase(item)
 
+    fun getPresentedItem() = dao.getPresentedItem()
+
+    fun setItemToPresent(itemToPresent: Item) = dao.setItemToPresent(itemToPresent)
+
 }
