@@ -19,7 +19,7 @@ import java.util.*
 class BrowserFragmentRVAdapter(
     options: FirestorePagingOptions<Item>,
     private val activity: Activity,
-    val fm: FragmentManager,
+    private val fm: FragmentManager,
     val viewModel : BrowserFragmentRvAdapterViewModel
 ) : FirestorePagingAdapter<Item, BrowserFragmentRVAdapter.BrowserFragmentViewHolder>(options) {
 
