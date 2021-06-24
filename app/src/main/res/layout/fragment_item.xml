@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="#CDCDCD">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -72,13 +73,16 @@
                         tools:text="12.99€" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <LinearLayout
+                <GridLayout
                     android:id="@+id/additionalInformationLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:background="@drawable/rectangle_borders"
                     android:minHeight="20dp"
+                    android:paddingHorizontal="4dp"
+                    android:useDefaultMargins="true"
+                    android:paddingVertical="2dp"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toTopOf="@id/itemDescription"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -109,6 +113,19 @@
         </com.erdees.toyswap.MaskedItemView>
 
 
+        <TextView
+            android:id="@+id/itemTimestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintTop_toBottomOf="@id/fragmentItemItemInfoLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="15:39 16-06-2020"
+            />
+
+
         <com.erdees.toyswap.MaskedItemView
             android:id="@+id/itemSellerInformationLayout"
             android:layout_width="match_parent"
@@ -117,7 +134,7 @@
             android:background="@drawable/seller_info_card"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fragmentItemItemInfoLayout"
+            app:layout_constraintTop_toBottomOf="@id/itemTimestamp"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.ToySwap.Card2">
 
             <androidx.constraintlayout.widget.ConstraintLayout
