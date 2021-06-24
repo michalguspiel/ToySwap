@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.erdees.toyswap.R
 import com.erdees.toyswap.databinding.FragmentItemBinding
 import com.erdees.toyswap.databinding.ItemAdditionalInfoBoxBinding
 import com.erdees.toyswap.model.models.item.Item
+import com.erdees.toyswap.view.adapters.ItemPicturesRvAdapter
 import com.erdees.toyswap.viewModel.ItemFragmentViewModel
 import java.text.NumberFormat
 import java.util.*
@@ -87,7 +89,10 @@ class ItemFragment : Fragment() {
     }
 
     private fun setPicturesRecyclerView(item: Item) {
-        // TODO make an array out of pics and set adapter to first recycler view which presents those pictures.
+        val picList = listOf(item.mainImageUrl) + item.otherImagesUrl
+        val adapter = ItemPicturesRvAdapter(picList,requireActivity())
+        binding.itemPicturesRv.adapter = adapter
+        binding.itemPicturesRv.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
     }
 
     private fun setSellerData(userId: String) {
