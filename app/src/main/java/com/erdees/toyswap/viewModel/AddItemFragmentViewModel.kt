@@ -55,9 +55,12 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
     fun addPicturesToCloud() = picturesRepository.addPicturesToCloud()
 
     fun addItemToFirebase(
-        name: String,
-        desc: String,
-        price: Double,
+        itemName: String,
+        itemDesc: String,
+        itemPrice: Double,
+        deliveryPrice: Double,
+        itemCondition : String,
+        itemSize: String
     ): Task<DocumentReference> {
         val mainPic =
             getUriOfPicsInCloudLiveData().value?.first { it.first == 0 }?.second.toString() // MAIN PIC MUST EXIST
@@ -68,12 +71,16 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
         val userId = getUserId()
         return itemRepository.addItemToFirebase(
             Item(
-                name,
+                itemName,
                 category.documentRef(),
-                desc,
-                price,
+                itemDesc,
+                itemSize,
+                itemCondition,
+                itemPrice,
+                deliveryPrice,
                 mainPic,
                 otherPics,
+                true,
                 Timestamp.now(),
                 userId!!
             )

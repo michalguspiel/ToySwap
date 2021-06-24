@@ -9,10 +9,15 @@ data class Item(
     val name: String = "",
     val category: DocumentReference = Firebase.firestore.collection("itemCategories").document(),
     val description: String = "",
+    val size : String = "",
+    val itemCondition: String = "",
     val price: Double = 0.0,
+    val deliveryCost: Double = 0.0,
     val mainImageUrl: String = "",
     val otherImagesUrl: List<String> = listOf(),
-    val timeStamp : Timestamp = Timestamp.now(),
+    val isItemAvailable: Boolean = true,
+    val timeStamp: Timestamp = Timestamp.now(),
     val userId: String = "",
-    ) {
+) {
+
 }

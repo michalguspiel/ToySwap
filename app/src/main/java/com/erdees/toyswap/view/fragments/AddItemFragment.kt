@@ -244,6 +244,12 @@ class AddItemFragment : Fragment() {
             binding.itemNameInput.text.toString(),
             binding.itemDescInput.text.toString(),
             binding.itemPriceInput.text.toString().toDouble(),
+            99.9,
+            "Used",
+            "52"
+            //binding.itemDeliveryCost.text.toString().toDouble(), // todo add this to UI and connect with this fields
+        //binding.itemCondition.text.toString(),
+        //binding.itemSize.text.toString()
         )
     }
 
