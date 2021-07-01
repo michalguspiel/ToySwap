@@ -2,9 +2,9 @@ package com.erdees.toyswap.model.firebaseAuth
 
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
-import com.erdees.toyswap.model.models.Address
 import com.erdees.toyswap.model.Registration
-import com.erdees.toyswap.model.models.ClientUser
+import com.erdees.toyswap.model.models.Address
+import com.erdees.toyswap.model.models.user.ToySwapUser
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
@@ -17,7 +17,7 @@ class AuthRepository(private val authDao: AuthDao) {
         return authDao.getUserLiveData()
     }
 
-    fun getClientUserLiveData() : MutableLiveData<ClientUser?> {
+    fun getClientUserLiveData() : MutableLiveData<ToySwapUser?> {
         return authDao.getClientUserLiveData()
     }
 
@@ -32,6 +32,10 @@ class AuthRepository(private val authDao: AuthDao) {
 
     fun updateAddress(address: Address): Task<Void>?{
        return authDao.updateAddress(address)
+    }
+
+    fun updatePublicInfoAboutAddress(city : String) : Task<Void>?{
+        return authDao.updatePublicInfoAboutAddress(city)
     }
 
     fun deleteCurrentAvatar() : Task<Void>{

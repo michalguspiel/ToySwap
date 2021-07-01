@@ -62,12 +62,16 @@ class ChangeAddressDialog : DialogFragment() {
                     binding.addressCity.text.toString()
                 )
                 viewModel.updateAddress(newAddress)?.addOnSuccessListener {
-                    this.dismiss()
-                    parentFragment?.view?.makeSnackbar("Address updated!")
+                    viewModel.updatePublicInfoAboutAddress(binding.addressCity.text.toString())?.addOnSuccessListener {
+                        this.dismiss()
+                        parentFragment?.view?.makeSnackbar("Address updated!")
+                    }?.addOnFailureListener {
+                        handleError()
+                    }
+
                 }
                     ?.addOnFailureListener {
-                        this.dismiss()
-                        parentFragment?.view?.makeSnackbar("Something went wrong!")
+                        handleError()
                     }
             }
         }
@@ -76,6 +80,11 @@ class ChangeAddressDialog : DialogFragment() {
         return view
     }
 
+
+    private fun handleError(){
+        this.dismiss()
+        parentFragment?.view?.makeSnackbar("Something went wrong!")
+    }
 
     private fun atLeastOneInputIsEmpty(): Boolean {
         return (binding.addressCity.text.isNullOrBlank() ||

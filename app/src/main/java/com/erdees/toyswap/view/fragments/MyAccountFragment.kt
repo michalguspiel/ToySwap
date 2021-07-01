@@ -49,7 +49,6 @@ class MyAccountFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         _binding = FragmentMyAccountBinding.inflate(inflater, container, false)
         view = binding.root
         viewModel = ViewModelProvider(this).get(MyAccountFragmentViewModel::class.java)
@@ -69,7 +68,6 @@ class MyAccountFragment : Fragment() {
                 with(it) {
                     if (addressStreet.isEmpty() && addressPostCode.isEmpty() && addressCity.isEmpty()) setEmptyFields()
                     else setFields(addressStreet, addressPostCode, addressCity)
-
                     setName("${it.firstName} ${it.lastName}")
                 }
             }
