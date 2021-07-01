@@ -38,7 +38,7 @@ class BrowserFragmentRVAdapter(
         position: Int,
         model: Item
     ) {
-        Log.i("ADAPTER TEST" , "${model.name} , $model")
+        Log.i(TAG , "${model.name} , $model")
         holder.viewBinding.titleTV.text = model.name
         holder.viewBinding.price.text = java.text.NumberFormat.getCurrencyInstance(Locale.FRENCH).format(model.price)
         Glide.with(activity)
@@ -47,9 +47,13 @@ class BrowserFragmentRVAdapter(
             .into(holder.viewBinding.itemPicture)
 
         holder.viewBinding.itemWholeLayout.setOnClickListener {
-            Log.i("TEST","ITEM CLICKED")
+            Log.i(TAG,"ITEM CLICKED")
         viewModel.setItemToPresent(model)
             Utils.openFragment(ItemFragment.newInstance(),ItemFragment.TAG,fm)
         }
+    }
+
+    companion object {
+        const val TAG = "BrowserRvAdapter"
     }
 }
