@@ -1,16 +1,19 @@
 package com.erdees.toyswap.view.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.erdees.toyswap.R
 import com.erdees.toyswap.databinding.FragmentItemBinding
 import com.erdees.toyswap.databinding.ItemAdditionalInfoBoxBinding
 import com.erdees.toyswap.model.models.item.Item
+import com.erdees.toyswap.model.models.user.PublicUserData
 import com.erdees.toyswap.view.adapters.ItemPicturesRvAdapter
 import com.erdees.toyswap.viewModel.ItemFragmentViewModel
 import java.text.NumberFormat
@@ -36,7 +39,7 @@ class ItemFragment : Fragment() {
             if (item != null) {
                 setBasicItemData(item)
                 setPicturesRecyclerView(item)
-                setSellerData(item.userId)
+                getSellerData(item.userId)
             }
         })
 
@@ -95,8 +98,33 @@ class ItemFragment : Fragment() {
         binding.itemPicturesRv.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
     }
 
-    private fun setSellerData(userId: String) {
-        // TODO fetch seller data from firebase and set it to the UI.
+    private fun getSellerData(userId: String) {
+    var seller  : PublicUserData?
+    seller =  viewModel.getSellerData(userId)
+        if(seller != null) setSellerData(seller)
+        else  viewModel.downloadSellerFromServer(userId).addOnSuccessListener {
+            seller = viewModel.getSellerData(userId)
+            setSellerData(seller)
+        }
+            .addOnFailureListener {
+                Log.i(TAG,"Handle error here.")
+            }
+    }
+
+    private fun setSellerData(seller: PublicUserData?) {
+        if(seller != null)    {
+            binding.sellerName.text = seller.firstName
+            binding.sellerCity.text = seller.addressCity
+            binding.sellerReputation.text = seller.reputation.toString()
+            Glide.with(requireContext())
+                .load(seller.avatar)
+                .circleCrop()
+                .into(binding.sellerAvatar)
+        }
+        else {
+            Log.i(TAG,"Handle error here.")
+        }
+
     }
 
     companion object {

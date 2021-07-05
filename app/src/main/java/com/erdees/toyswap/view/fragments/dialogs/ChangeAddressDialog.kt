@@ -62,13 +62,8 @@ class ChangeAddressDialog : DialogFragment() {
                     binding.addressCity.text.toString()
                 )
                 viewModel.updateAddress(newAddress)?.addOnSuccessListener {
-                    viewModel.updatePublicInfoAboutAddress(binding.addressCity.text.toString())?.addOnSuccessListener {
-                        this.dismiss()
-                        parentFragment?.view?.makeSnackbar("Address updated!")
-                    }?.addOnFailureListener {
-                        handleError()
-                    }
-
+                    this.dismiss()
+                    parentFragment?.view?.makeSnackbar("Address updated!")
                 }
                     ?.addOnFailureListener {
                         handleError()

@@ -3,33 +3,33 @@ package com.erdees.toyswap.viewModel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.toyswap.model.Registration
-import com.erdees.toyswap.model.firebaseAuth.AuthDao
-import com.erdees.toyswap.model.firebaseAuth.AuthRepository
+import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
+import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 
 class LoginActivityViewModel(application: Application): AndroidViewModel(application) {
 
-    private val authRepository : AuthRepository
+    private val authUserRepository : AuthUserRepository
 
     init {
-        val authDao = AuthDao.getInstance(application)
-        authRepository = AuthRepository(authDao)
+        val authDao = AuthUserDao.getInstance(application)
+        authUserRepository = AuthUserRepository(authDao)
     }
 
-    val clientUserLiveData = authRepository.getClientUserLiveData()
+    val clientUserLiveData = authUserRepository.getClientUserLiveData()
 
 
     fun registerWithEmail(registration: Registration) : Task<AuthResult> {
-        return authRepository.registerWithPassword(registration)
+        return authUserRepository.registerWithPassword(registration)
     }
 
     fun loginWithEmail(email: String, password: String): Task<AuthResult>{
-        return authRepository.loginWithPassword(email,password)
+        return authUserRepository.loginWithPassword(email,password)
     }
 
     fun signUpWithGoogle(token : String):Task<AuthResult> {
-        return authRepository.firebaseAuthWithGoogle(token)
+        return authUserRepository.firebaseAuthWithGoogle(token)
     }
 
 }

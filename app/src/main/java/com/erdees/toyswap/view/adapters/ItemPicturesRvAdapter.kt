@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.erdees.toyswap.databinding.ItemPictureRvItemBinding
 
-class ItemPicturesRvAdapter(private val picturesList : List<String>,val activity : Activity): RecyclerView.Adapter<ItemPicturesRvAdapter.ItemViewHolder>() {
+class ItemPicturesRvAdapter(private val picturesList : List<String>, private val activity : Activity): RecyclerView.Adapter<ItemPicturesRvAdapter.ItemViewHolder>() {
 
     class ItemViewHolder(val viewBinding: ItemPictureRvItemBinding) : RecyclerView.ViewHolder(viewBinding.root)
 

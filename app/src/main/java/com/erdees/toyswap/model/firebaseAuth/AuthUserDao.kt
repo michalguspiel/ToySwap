@@ -19,7 +19,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 
-class AuthDao(private val application: Application) {
+class AuthUserDao(private val application: Application) {
 
     private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firebaseUserLiveData: MutableLiveData<FirebaseUser?> =
@@ -193,23 +193,21 @@ class AuthDao(private val application: Application) {
 
     fun updateAddress(address: Address): Task<Void>? {
         with(address) {
-            setUserAddress(address)
             return userDocRefLiveData.value?.update(
                 "addressStreet", street,
                 "addressPostCode", postCode,
                 "addressCity", city
-            )
+            )?.addOnSuccessListener {
+                updateClientAddressLiveData(address)
+                updatePublicInfoAboutAddress(city)
+            }
         }
     }
 
-    fun updatePublicInfoAboutAddress(city : String ): Task<Void>?{
+    private fun updatePublicInfoAboutAddress(city : String ): Task<Void>?{
         return userPublicInfoDocRefLiveData.value?.update(
             "addressCity", city
         )
-    }
-
-    private fun setUserAddress(address: Address) {
-        updateClientAddressLiveData(address)
     }
 
     private fun updateClientAddressLiveData(address: Address) {
@@ -322,13 +320,13 @@ class AuthDao(private val application: Application) {
 
     /**SINGLETON*/
     companion object {
-        const val TAG = "AuthDao"
+        const val TAG = "AuthUserDao"
         @Volatile
-        private var instance: AuthDao? = null
+        private var instance: AuthUserDao? = null
         fun getInstance(application: Application) =
             instance ?: synchronized(this) {
                 instance
-                    ?: AuthDao(application).also { instance = it }
+                    ?: AuthUserDao(application).also { instance = it }
             }
     }
 }

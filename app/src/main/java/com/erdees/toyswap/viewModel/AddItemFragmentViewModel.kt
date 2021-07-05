@@ -3,8 +3,8 @@ package com.erdees.toyswap.viewModel
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
-import com.erdees.toyswap.model.firebaseAuth.AuthDao
-import com.erdees.toyswap.model.firebaseAuth.AuthRepository
+import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
+import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
 import com.erdees.toyswap.model.firebaseQuery.ItemDao
 import com.erdees.toyswap.model.firebaseQuery.ItemRepository
 import com.erdees.toyswap.model.models.item.Item
@@ -22,18 +22,18 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
 
     private var itemRepository: ItemRepository
 
-    private var authRepository: AuthRepository
+    private var authUserRepository: AuthUserRepository
 
 
     init {
         val itemDao = ItemDao.getInstance()
         itemRepository = ItemRepository(itemDao)
-        val authDao = AuthDao.getInstance(application)
-        authRepository = AuthRepository(authDao)
+        val authDao = AuthUserDao.getInstance(application)
+        authUserRepository = AuthUserRepository(authDao)
 
     }
 
-    fun getUserId() = authRepository.getUserLiveData().value?.uid
+    fun getUserId() = authUserRepository.getUserLiveData().value?.uid
 
     val categoryLiveData = categoryRepository.getCategoryLiveData()
 

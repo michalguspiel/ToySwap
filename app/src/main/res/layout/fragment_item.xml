@@ -21,17 +21,29 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+
+        <Space
+            android:id="@+id/helperView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="@id/itemPicturesRv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <com.erdees.toyswap.MaskedItemView
             android:id="@+id/fragmentItemItemInfoLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="0dp"
+            android:layout_marginTop="-30dp"
             android:background="@drawable/item_info_card"
             app:cardElevation="7dp"
             app:cardPreventCornerOverlap="true"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/itemPicturesRv"
+            app:layout_constraintTop_toBottomOf="@id/helperView"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.ToySwap.Card">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -80,10 +92,10 @@
                     android:layout_marginTop="4dp"
                     android:background="@drawable/rectangle_borders"
                     android:minHeight="20dp"
-                    android:paddingHorizontal="4dp"
-                    android:useDefaultMargins="true"
-                    android:paddingVertical="2dp"
                     android:orientation="horizontal"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="2dp"
+                    android:useDefaultMargins="true"
                     app:layout_constraintBottom_toTopOf="@id/itemDescription"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -111,7 +123,6 @@
                 android:layout_marginTop="2dp"
                 android:background="@color/black" />
         </com.erdees.toyswap.MaskedItemView>
-
 
         <TextView
             android:id="@+id/itemTimestamp"

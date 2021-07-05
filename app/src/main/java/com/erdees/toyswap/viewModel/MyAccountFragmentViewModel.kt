@@ -3,49 +3,49 @@ package com.erdees.toyswap.viewModel
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
-import com.erdees.toyswap.model.firebaseAuth.AuthDao
-import com.erdees.toyswap.model.firebaseAuth.AuthRepository
+import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
+import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.UploadTask
 
 class MyAccountFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val authRepository : AuthRepository
+    private val authUserRepository : AuthUserRepository
 
 
 
     init {
-        val authDao = AuthDao.getInstance(application)
-        authRepository = AuthRepository(authDao)
+        val authDao = AuthUserDao.getInstance(application)
+        authUserRepository = AuthUserRepository(authDao)
     }
 
-    val clientUserData = authRepository.getClientUserLiveData()
+    val clientUserData = authUserRepository.getClientUserLiveData()
 
-    val userLiveData = authRepository.getUserLiveData()
+    val userLiveData = authUserRepository.getUserLiveData()
 
-    val isUserLoggedOutLiveData = authRepository.getIsUserLoggedOutLiveData()
+    val isUserLoggedOutLiveData = authUserRepository.getIsUserLoggedOutLiveData()
 
-    val userAuthProviderLiveData = authRepository.getUserSignInProvider()
+    val userAuthProviderLiveData = authUserRepository.getUserSignInProvider()
 
 
     fun deleteCurrentAvatar() : Task<Void>{
-        return authRepository.deleteCurrentAvatar()
+        return authUserRepository.deleteCurrentAvatar()
     }
 
     fun uploadNewAvatar(imageUri: Uri) : UploadTask {
-        return  authRepository.uploadNewAvatar(imageUri)
+        return  authUserRepository.uploadNewAvatar(imageUri)
     }
 
     fun getNewAvatarUrl() : Task<Uri> {
-        return authRepository.getNewAvatarUrl()
+        return authUserRepository.getNewAvatarUrl()
     }
 
     fun updateAvatar(uri: String): Task<Void>? {
-        return authRepository.updateAvatar(uri)
+        return authUserRepository.updateAvatar(uri)
     }
 
     fun signOut() {
-        authRepository.signOut()
+        authUserRepository.signOut()
     }
 
 }
