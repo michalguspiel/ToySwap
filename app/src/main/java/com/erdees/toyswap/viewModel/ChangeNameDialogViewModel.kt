@@ -2,24 +2,24 @@ package com.erdees.toyswap.viewModel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.erdees.toyswap.model.firebaseAuth.AuthDao
-import com.erdees.toyswap.model.firebaseAuth.AuthRepository
+import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
+import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
 import com.google.android.gms.tasks.Task
 
 class ChangeNameDialogViewModel (application: Application) : AndroidViewModel(application) {
 
-    private val authRepository : AuthRepository
+    private val authUserRepository : AuthUserRepository
 
     init {
-        val authDao = AuthDao.getInstance(application)
-        authRepository = AuthRepository(authDao)
+        val authDao = AuthUserDao.getInstance(application)
+        authUserRepository = AuthUserRepository(authDao)
     }
 
     fun updateNames(firstName: String , lastName: String): Task<Void>? {
-         return authRepository.updateNames(firstName,lastName)
+         return authUserRepository.updateNames(firstName,lastName)
     }
 
-    val clientUserLiveData = authRepository.getClientUserLiveData()
+    val clientUserLiveData = authUserRepository.getClientUserLiveData()
 
 
 }

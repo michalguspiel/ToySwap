@@ -66,8 +66,7 @@ class ChangeAddressDialog : DialogFragment() {
                     parentFragment?.view?.makeSnackbar("Address updated!")
                 }
                     ?.addOnFailureListener {
-                        this.dismiss()
-                        parentFragment?.view?.makeSnackbar("Something went wrong!")
+                        handleError()
                     }
             }
         }
@@ -76,6 +75,11 @@ class ChangeAddressDialog : DialogFragment() {
         return view
     }
 
+
+    private fun handleError(){
+        this.dismiss()
+        parentFragment?.view?.makeSnackbar("Something went wrong!")
+    }
 
     private fun atLeastOneInputIsEmpty(): Boolean {
         return (binding.addressCity.text.isNullOrBlank() ||

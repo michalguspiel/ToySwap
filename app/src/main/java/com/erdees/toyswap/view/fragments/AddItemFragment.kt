@@ -17,12 +17,13 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
-import com.erdees.toyswap.Constants
+import com.erdees.toyswap.model.Constants
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
 import com.erdees.toyswap.Utils.disable
 import com.erdees.toyswap.Utils.enable
 import com.erdees.toyswap.Utils.makeGone
+import com.erdees.toyswap.Utils.postRxValueBasedOnEditText
 import com.erdees.toyswap.Utils.setMargins
 import com.erdees.toyswap.databinding.FragmentAddItemBinding
 import com.erdees.toyswap.databinding.PictureGridItemBinding
@@ -107,16 +108,15 @@ class AddItemFragment : Fragment() {
         }
 
         binding.itemNameInput.addTextChangedListener {
-            if (it.isNullOrBlank()) isNameProvidedRX.onNext(false) else isNameProvidedRX.onNext(true)
+            if (it != null) isNameProvidedRX.postRxValueBasedOnEditText(it)
         }
         binding.itemDescInput.addTextChangedListener {
-            if (it.isNullOrBlank()) isDescProvidedRX.onNext(false) else isDescProvidedRX.onNext(true)
+            if (it != null) isDescProvidedRX.postRxValueBasedOnEditText(it)
         }
         binding.itemPriceInput.addTextChangedListener {
-            if (it.isNullOrBlank()) isPriceProvidedRX.onNext(false) else isPriceProvidedRX.onNext(
-                true
-            )
+            if (it != null) isPriceProvidedRX.postRxValueBasedOnEditText(it)
         }
+
 
         binding.submitItemButton.setOnClickListener {
             viewModel.addPicturesToCloud()
@@ -174,8 +174,13 @@ class AddItemFragment : Fragment() {
     private fun showSuccessDialog(){
         alertDialog = AlertDialog.Builder(requireContext())
             .setMessage("Your item was added successfully!")
+            .setPositiveButton("Show added item",null)
             .setNegativeButton("Back",null)
             .show()
+
+    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+        TODO("When this is clicked [ItemFragment] with just added item should be opened, I'll leave this todo in here since I don't have [ItemFragment yet].")
+    }
     }
 
     private fun endLoadingAndShowFailureDialog(){
@@ -239,6 +244,12 @@ class AddItemFragment : Fragment() {
             binding.itemNameInput.text.toString(),
             binding.itemDescInput.text.toString(),
             binding.itemPriceInput.text.toString().toDouble(),
+            99.9,
+            "Used",
+            "52"
+            //binding.itemDeliveryCost.text.toString().toDouble(), // todo add this to UI and connect with this fields
+        //binding.itemCondition.text.toString(),
+        //binding.itemSize.text.toString()
         )
     }
 

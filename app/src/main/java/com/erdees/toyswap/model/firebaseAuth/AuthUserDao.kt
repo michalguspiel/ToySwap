@@ -8,9 +8,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.erdees.toyswap.model.Registration
 import com.erdees.toyswap.model.models.Address
-import com.erdees.toyswap.model.models.ClientUser
-import com.erdees.toyswap.view.activities.LoginActivity
+import com.erdees.toyswap.model.models.user.ToySwapUser
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -19,16 +19,16 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 
-class AuthDao(private val application: Application) {
+class AuthUserDao(private val application: Application) {
 
     private var firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firebaseUserLiveData: MutableLiveData<FirebaseUser?> =
         MutableLiveData<FirebaseUser?>()
     private val isUserLoggedOutLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
-    private val docRefLiveData: MutableLiveData<DocumentReference> =
-        MutableLiveData<DocumentReference>()
+    private val userDocRefLiveData: MutableLiveData<DocumentReference> = MutableLiveData<DocumentReference>()
+    private val userPublicInfoDocRefLiveData: MutableLiveData<DocumentReference> = MutableLiveData<DocumentReference>()
 
-    private val clientUserLiveData: MutableLiveData<ClientUser?> = MutableLiveData<ClientUser?>()
+    private val toySwapUserLiveData: MutableLiveData<ToySwapUser?> = MutableLiveData<ToySwapUser?>()
 
     private val userAuthProviderTokenLiveData : MutableLiveData<String> = MutableLiveData<String>()
 
@@ -53,9 +53,10 @@ class AuthDao(private val application: Application) {
                 val addressCity: String = it["addressCity"].toString()
                 val addressPostCode: String = it["addressPostCode"].toString()
                 val addressStreet: String = it["addressStreet"].toString()
+                val accCreationTimeStamp : Timestamp = it["accCreationTimestamp"] as Timestamp
 
                 val thisSessionUser =
-                    ClientUser(
+                    ToySwapUser(
                         name,
                         lastName,
                         email,
@@ -64,16 +65,27 @@ class AuthDao(private val application: Application) {
                         avatar,
                         addressCity,
                         addressPostCode,
-                        addressStreet
+                        addressStreet,
+                        accCreationTimeStamp
                     )
-                Log.i("TEST", "this session user saved ! $thisSessionUser")
-                clientUserLiveData.postValue(thisSessionUser)
+                Log.i(TAG, "this session user saved ! $thisSessionUser")
+                toySwapUserLiveData.postValue(thisSessionUser)
             }
         }
         else {
-            clientUserLiveData.postValue(null)
+            toySwapUserLiveData.postValue(null)
 
         }
+    }
+
+    private fun FirebaseUser.updateDocumentReferences(){
+        val userDocRef =
+            Firebase.firestore.collection("users").document(this.uid)
+        val userPublicInfoDocRef = Firebase.firestore.collection("usersPublicInfo").document(this.uid)
+        userDocRefLiveData.value = (userDocRef)
+        userPublicInfoDocRefLiveData.value = (userPublicInfoDocRef)
+        saveFirebaseUserAsClientUser(userDocRef)
+
     }
 
     private fun updateUserLiveData() {
@@ -82,21 +94,19 @@ class AuthDao(private val application: Application) {
             firebaseUserLiveData.postValue(firebaseAuth.currentUser)
             fireBaseUser.getIdToken(false).addOnSuccessListener { userAuthProviderTokenLiveData.postValue(it.signInProvider) }
             isUserLoggedOutLiveData.postValue(false)
-            val docRef =
-                Firebase.firestore.collection("users").document(fireBaseUser.uid)
-            docRefLiveData.postValue(docRef)
-            saveFirebaseUserAsClientUser(docRef)
+            fireBaseUser.updateDocumentReferences()
+            saveFirebaseUserAsClientUser(userDocRefLiveData.value)
         } else {
             isUserLoggedOutLiveData.value = true
             firebaseUserLiveData.value = null
-            clientUserLiveData.value = null
+            toySwapUserLiveData.value = null
             saveFirebaseUserAsClientUser(null)
         }
     }
 
 
-    fun getClientUserLiveData(): MutableLiveData<ClientUser?> {
-        return clientUserLiveData
+    fun getClientUserLiveData(): MutableLiveData<ToySwapUser?> {
+        return toySwapUserLiveData
     }
 
     fun getUserLiveData(): MutableLiveData<FirebaseUser?> {
@@ -117,11 +127,11 @@ class AuthDao(private val application: Application) {
             .addOnCompleteListener(ContextCompat.getMainExecutor(application)) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    Log.d(LoginActivity.TAG, "createUserWithEmail:success")
+                    Log.d(TAG, "createUserWithEmail:success")
                     if(firebaseAuth.currentUser != null) checkIfDocumentExistAndIfSoContinue()
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w(LoginActivity.TAG, "createUserWithEmail:failure", task.exception)
+                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     Toast.makeText(
                         application.applicationContext, "Authentication failed.",
                         Toast.LENGTH_SHORT
@@ -135,11 +145,11 @@ class AuthDao(private val application: Application) {
             .addOnCompleteListener(ContextCompat.getMainExecutor(application)) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    Log.d(LoginActivity.TAG, "signInWithEmail:success")
+                    Log.d(TAG, "signInWithEmail:success")
                     if(firebaseAuth.currentUser != null) checkIfDocumentExistAndIfSoContinue()
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w(LoginActivity.TAG, "signInWithEmail:failure", task.exception)
+                    Log.w(TAG, "signInWithEmail:failure", task.exception)
                     Toast.makeText(
                         application.applicationContext, "Authentication failed.",
                         Toast.LENGTH_SHORT
@@ -154,12 +164,12 @@ class AuthDao(private val application: Application) {
             .addOnCompleteListener(ContextCompat.getMainExecutor(application)) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    Log.d(LoginActivity.TAG, "signInWithCredential:success")
+                    Log.d(TAG, "signInWithCredential:success")
                     if(firebaseAuth.currentUser != null) checkIfDocumentExistAndIfSoContinue()
 
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w(LoginActivity.TAG, "signInWithCredential:failure", task.exception)
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
                 }
             }
 
@@ -183,23 +193,27 @@ class AuthDao(private val application: Application) {
 
     fun updateAddress(address: Address): Task<Void>? {
         with(address) {
-            setUserAddress(address)
-            return docRefLiveData.value?.update(
+            return userDocRefLiveData.value?.update(
                 "addressStreet", street,
                 "addressPostCode", postCode,
                 "addressCity", city
-            )
+            )?.addOnSuccessListener {
+                updateClientAddressLiveData(address)
+                updatePublicInfoAboutAddress(city)
+            }
         }
     }
 
-    private fun setUserAddress(address: Address) {
-        updateClientAddressLiveData(address)
+    private fun updatePublicInfoAboutAddress(city : String ): Task<Void>?{
+        return userPublicInfoDocRefLiveData.value?.update(
+            "addressCity", city
+        )
     }
 
     private fun updateClientAddressLiveData(address: Address) {
-        val thisClient = clientUserLiveData.value
+        val thisClient = toySwapUserLiveData.value
         if (thisClient != null) {
-            val updatedClient = ClientUser(
+            val updatedClient = ToySwapUser(
                 thisClient.firstName,
                 thisClient.lastName,
                 thisClient.emailAddress,
@@ -208,17 +222,18 @@ class AuthDao(private val application: Application) {
                 thisClient.avatar,
                 address.city,
                 address.postCode,
-                address.street
+                address.street,
+                thisClient.accCreationTimeStamp
             )
-        clientUserLiveData.postValue(updatedClient)
+        toySwapUserLiveData.postValue(updatedClient)
         }
-    else Log.i("AuthDao","ERROR UPDATING CLIENT ADDRESS!")
+    else Log.i(TAG,"ERROR UPDATING CLIENT ADDRESS!")
     }
 
     private fun updateClientAvatar(uri: String) {
-        val thisClient = clientUserLiveData.value
+        val thisClient = toySwapUserLiveData.value
         if (thisClient != null) {
-            val updatedClient = ClientUser(
+            val updatedClient = ToySwapUser(
                 thisClient.firstName,
                 thisClient.lastName,
                 thisClient.emailAddress,
@@ -227,21 +242,29 @@ class AuthDao(private val application: Application) {
                 uri,
                 thisClient.addressCity,
                 thisClient.addressPostCode,
-                thisClient.addressStreet
+                thisClient.addressStreet,
+                thisClient.accCreationTimeStamp
             )
-            clientUserLiveData.postValue(updatedClient)
+            toySwapUserLiveData.postValue(updatedClient)
         }
-        else Log.i("AuthDao","ERROR UPDATING CLIENT AVATAR!")
+        else Log.i(TAG,"ERROR UPDATING CLIENT AVATAR!")
+    }
+
+    private fun updatePublicAvatarInfo(uri : String) {
+        userPublicInfoDocRefLiveData.value?.update("avatar",uri)
     }
 
     fun updateFirebaseUserAvatar(uri: String): Task<Void>?{
-        return docRefLiveData.value?.update("avatar",uri)?.addOnSuccessListener { updateClientAvatar(uri)}
+        return userDocRefLiveData.value?.update("avatar",uri)?.addOnSuccessListener {
+            updatePublicAvatarInfo(uri)
+            updateClientAvatar(uri)
+        }
         }
 
     private fun updateClientName(firstName: String, lastName: String){
-        val thisClient = clientUserLiveData.value
+        val thisClient = toySwapUserLiveData.value
         if(thisClient != null){
-            val updatedClient = ClientUser(
+            val updatedClient = ToySwapUser(
                 firstName,
                 lastName,
                 thisClient.emailAddress,
@@ -250,15 +273,23 @@ class AuthDao(private val application: Application) {
                 thisClient.avatar,
                 thisClient.addressCity,
                 thisClient.addressPostCode,
-                thisClient.addressStreet
+                thisClient.addressStreet,
+                thisClient.accCreationTimeStamp
             )
-            clientUserLiveData.postValue(updatedClient)
+            toySwapUserLiveData.postValue(updatedClient)
         }
     }
 
+    fun updatePublicInfoAboutName(firstName: String){
+        userPublicInfoDocRefLiveData.value?.update("firstName",firstName)
+    }
+
     fun updateNames(firstName: String,lastName: String): Task<Void>? {
-        return docRefLiveData.value?.update("firstName",firstName,"lastName",lastName)
-            ?.addOnSuccessListener { updateClientName(firstName,lastName) }
+        return userDocRefLiveData.value?.update("firstName",firstName,"lastName",lastName)
+            ?.addOnSuccessListener {
+                updateClientName(firstName,lastName)
+                updatePublicInfoAboutName(firstName)
+            }
 
     }
 
@@ -289,12 +320,13 @@ class AuthDao(private val application: Application) {
 
     /**SINGLETON*/
     companion object {
+        const val TAG = "AuthUserDao"
         @Volatile
-        private var instance: AuthDao? = null
+        private var instance: AuthUserDao? = null
         fun getInstance(application: Application) =
             instance ?: synchronized(this) {
                 instance
-                    ?: AuthDao(application).also { instance = it }
+                    ?: AuthUserDao(application).also { instance = it }
             }
     }
 }

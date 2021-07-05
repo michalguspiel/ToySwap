@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ShapeAppearance.ToySwap.Card" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">rounded</item>
+
+        <item name="cornerSizeTopLeft">14dp</item>
+        <item name="cornerSizeTopRight">14dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.ToySwap.Card2" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">rounded</item>
+
+        <item name="cornerSizeTopLeft">14dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.ToySwap.box" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">rounded</item>
+
+        <item name="cornerSizeTopLeft">2dp</item>
+        <item name="cornerSizeTopRight">2dp</item>
+        <item name="cornerSizeBottomRight">2dp</item>
+        <item name="cornerSizeBottomLeft">2dp</item>
+    </style>
+
+</resources>

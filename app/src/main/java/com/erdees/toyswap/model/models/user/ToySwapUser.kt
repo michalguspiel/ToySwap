@@ -1,6 +1,8 @@
-package com.erdees.toyswap.model.models
+package com.erdees.toyswap.model.models.user
 
-data class ClientUser(
+import com.google.firebase.Timestamp
+
+data class ToySwapUser(
     val firstName: String = "",
     val lastName : String = "",
     val emailAddress: String = "",
@@ -9,7 +11,8 @@ data class ClientUser(
     val avatar: String = "",
     val addressCity: String = "",
     val addressPostCode: String = "",
-    val addressStreet: String = ""
+    val addressStreet: String = "",
+    val accCreationTimeStamp : Timestamp = Timestamp.now()
 ) {
 
 }

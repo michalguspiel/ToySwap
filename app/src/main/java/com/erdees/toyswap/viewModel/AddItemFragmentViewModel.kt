@@ -3,8 +3,8 @@ package com.erdees.toyswap.viewModel
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
-import com.erdees.toyswap.model.firebaseAuth.AuthDao
-import com.erdees.toyswap.model.firebaseAuth.AuthRepository
+import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
+import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
 import com.erdees.toyswap.model.firebaseQuery.ItemDao
 import com.erdees.toyswap.model.firebaseQuery.ItemRepository
 import com.erdees.toyswap.model.models.item.Item
@@ -22,18 +22,18 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
 
     private var itemRepository: ItemRepository
 
-    private var authRepository: AuthRepository
+    private var authUserRepository: AuthUserRepository
 
 
     init {
         val itemDao = ItemDao.getInstance()
         itemRepository = ItemRepository(itemDao)
-        val authDao = AuthDao.getInstance(application)
-        authRepository = AuthRepository(authDao)
+        val authDao = AuthUserDao.getInstance(application)
+        authUserRepository = AuthUserRepository(authDao)
 
     }
 
-    fun getUserId() = authRepository.getUserLiveData().value?.uid
+    fun getUserId() = authUserRepository.getUserLiveData().value?.uid
 
     val categoryLiveData = categoryRepository.getCategoryLiveData()
 
@@ -55,9 +55,12 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
     fun addPicturesToCloud() = picturesRepository.addPicturesToCloud()
 
     fun addItemToFirebase(
-        name: String,
-        desc: String,
-        price: Double,
+        itemName: String,
+        itemDesc: String,
+        itemPrice: Double,
+        deliveryPrice: Double,
+        itemCondition : String,
+        itemSize: String
     ): Task<DocumentReference> {
         val mainPic =
             getUriOfPicsInCloudLiveData().value?.first { it.first == 0 }?.second.toString() // MAIN PIC MUST EXIST
@@ -68,12 +71,16 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
         val userId = getUserId()
         return itemRepository.addItemToFirebase(
             Item(
-                name,
+                itemName,
                 category.documentRef(),
-                desc,
-                price,
+                itemDesc,
+                itemSize,
+                itemCondition,
+                itemPrice,
+                deliveryPrice,
                 mainPic,
                 otherPics,
+                true,
                 Timestamp.now(),
                 userId!!
             )
