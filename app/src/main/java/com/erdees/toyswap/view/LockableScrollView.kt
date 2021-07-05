@@ -1,4 +1,4 @@
-package com.erdees.toyswap
+package com.erdees.toyswap.view
 
 import android.content.Context
 import android.util.AttributeSet

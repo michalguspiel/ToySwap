@@ -1,6 +1,8 @@
 package com.erdees.toyswap.view.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +14,7 @@ import com.bumptech.glide.Glide
 import com.erdees.toyswap.R
 import com.erdees.toyswap.databinding.FragmentItemBinding
 import com.erdees.toyswap.databinding.ItemAdditionalInfoBoxBinding
+import com.erdees.toyswap.model.Reputation
 import com.erdees.toyswap.model.models.item.Item
 import com.erdees.toyswap.model.models.user.PublicUserData
 import com.erdees.toyswap.view.adapters.ItemPicturesRvAdapter
@@ -111,11 +114,16 @@ class ItemFragment : Fragment() {
             }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setSellerData(seller: PublicUserData?) {
         if(seller != null)    {
             binding.sellerName.text = seller.firstName
             binding.sellerCity.text = seller.addressCity
-            binding.sellerReputation.text = seller.reputation.toString()
+            binding.sellerReputation.text = Reputation(seller.reputation).reputationDesc
+            binding.sellerExperience.text = getString(R.string.in_toyswap_since) +" " +  DateFormat.format(
+                "dd-MM-yyyy",
+                seller.accCreationTimeStamp.toDate()
+            )
             Glide.with(requireContext())
                 .load(seller.avatar)
                 .circleCrop()

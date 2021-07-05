@@ -17,7 +17,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
-import com.erdees.toyswap.Constants
+import com.erdees.toyswap.model.Constants
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
 import com.erdees.toyswap.Utils.disable

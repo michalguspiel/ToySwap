@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
-    android:background="#CDCDCD">
+    android:background="#CDCDCD"
+    android:fitsSystemWindows="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -28,10 +28,10 @@
             android:layout_height="0dp"
             android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="@id/itemPicturesRv"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <com.erdees.toyswap.MaskedItemView
+        <com.erdees.toyswap.view.MaskedItemView
             android:id="@+id/fragmentItemItemInfoLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -122,22 +122,21 @@
                 android:layout_gravity="bottom"
                 android:layout_marginTop="2dp"
                 android:background="@color/black" />
-        </com.erdees.toyswap.MaskedItemView>
+        </com.erdees.toyswap.view.MaskedItemView>
 
         <TextView
             android:id="@+id/itemTimestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
             android:layout_marginTop="4dp"
-            app:layout_constraintTop_toBottomOf="@id/fragmentItemItemInfoLayout"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:text="15:39 16-06-2020"
-            />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fragmentItemItemInfoLayout"
+            tools:text="15:39 16-06-2020" />
 
 
-        <com.erdees.toyswap.MaskedItemView
+        <com.erdees.toyswap.view.MaskedItemView
             android:id="@+id/itemSellerInformationLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -170,27 +169,40 @@
                         android:contentDescription="@string/seller_avatar" />
                 </FrameLayout>
 
-                <TextView
-                    android:id="@+id/sellerName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="16dp"
-                    android:textSize="26sp"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toTopOf="@+id/sellerReputationLayout"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/frameLayout"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Bill Hones" />
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:id="@+id/sellerCity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:textSize="22sp"
-                    app:layout_constraintStart_toEndOf="@+id/frameLayout"
-                    app:layout_constraintTop_toBottomOf="@id/sellerName"
-                    tools:text="Los Angeles" />
+                    <TextView
+                        android:id="@+id/sellerName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="12dp"
+                        android:textSize="26sp"
+                        tools:text="Bill Hones" />
 
+                    <TextView
+                        android:id="@+id/sellerCity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="9dp"
+                        android:textSize="22sp"
+                        tools:text="Los Angeles" />
+
+                    <TextView
+                        android:id="@+id/sellerExperience"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="6dp"
+                        tools:text="In ToySwap since 22.02.2020" />
+                </LinearLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/sellerReputationLayout"
@@ -232,9 +244,9 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.erdees.toyswap.MaskedItemView>
+        </com.erdees.toyswap.view.MaskedItemView>
 
-        <com.erdees.toyswap.MaskedItemView
+        <com.erdees.toyswap.view.MaskedItemView
             android:id="@+id/itemButtonsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -296,10 +308,10 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.erdees.toyswap.MaskedItemView>
+        </com.erdees.toyswap.view.MaskedItemView>
 
 
-        <com.erdees.toyswap.MaskedItemView
+        <com.erdees.toyswap.view.MaskedItemView
             android:id="@+id/similarItemsRvLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -314,24 +326,24 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="22sp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="2dp"
-                android:text="@string/items_you_might_find_interesting" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/items_you_might_find_interesting"
+                    android:textSize="22sp" />
 
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/similarItemsRv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="100dp"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/similarItemsRv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:minHeight="100dp"
+                    android:orientation="horizontal" />
             </LinearLayout>
-        </com.erdees.toyswap.MaskedItemView>
+        </com.erdees.toyswap.view.MaskedItemView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
