@@ -16,8 +16,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.erdees.toyswap.Constants
-import com.erdees.toyswap.Constants.REQUEST_CODE
+import com.erdees.toyswap.model.Constants
+import com.erdees.toyswap.model.Constants.REQUEST_CODE
 import com.erdees.toyswap.Utils.launchImageCrop
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeVisible

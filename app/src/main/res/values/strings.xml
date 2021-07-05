@@ -20,4 +20,5 @@
     <string name="delivery_price">Delivery price:</string>
     <string name="user_reputation">User reputation:</string>
     <string name="seller_avatar">seller avatar</string>
+    <string name="in_toyswap_since">In Toyswap since</string>
 </resources>

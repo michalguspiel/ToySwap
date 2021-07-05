@@ -1,4 +1,4 @@
-package com.erdees.toyswap
+package com.erdees.toyswap.model
 
 object Constants {
     const val REQUEST_CODE = 149

@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import com.erdees.toyswap.Constants.RC_SIGN_IN
+import com.erdees.toyswap.model.Constants.RC_SIGN_IN
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils.makeGone
 import com.erdees.toyswap.Utils.makeVisible
