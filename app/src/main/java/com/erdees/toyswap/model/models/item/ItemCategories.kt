@@ -7,36 +7,46 @@ package com.erdees.toyswap.model.models.item
  * */
 
 class ItemCategories {
-    object MainCategory : ItemCategory("Category",null,listOf(Kids, Sports),docName = "category")
+
+    object MainCategory : ItemCategory("MainCategory",null,listOf(Kids, Sports))
     /**Main Categories*/
-    object Kids : ItemCategory("Kids", MainCategory, listOf(Toys),docName = "kids")
-    object Sports : ItemCategory("Sport",MainCategory, listOf(Bikes, Teamsports, Individualsports),docName = "sports")
+    object Kids : ItemCategory("Kids", MainCategory, listOf(Toys))
+    object Sports : ItemCategory("Sport",MainCategory, listOf(Bikes, Teamsports, Individualsports))
     /**Sub Categories*/
-    object Bikes : ItemCategory("Bikes", Sports, listOf(AdultBikes, KidsBikes),docName = "bikes")
-    object Teamsports : ItemCategory("Team sports", Sports, null,docName = "teamSports")
-    object Individualsports : ItemCategory("Individual sports", Sports, null,docName = "individualSports")
-    object Toys : ItemCategory("Toys", Kids, listOf(Cars, Dolls),docName = "toys")
+    object Bikes : ItemCategory("Bikes", Sports, listOf(AdultBikes, KidsBikes))
+    object Teamsports : ItemCategory("Team sports", Sports, null)
+    object Individualsports : ItemCategory("Individual sports", Sports, null)
+    object Toys : ItemCategory("Toys", Kids, listOf(Cars, Dolls))
 
     /**Children categories*/
-    object Dolls : ItemCategory("Dolls", Toys, null,docName = "dolls")
-    object Cars : ItemCategory("Cars", Toys, null,docName = "cars")
+    object Dolls : ItemCategory("Dolls", Toys, null)
+    object Cars : ItemCategory("Cars", Toys, null)
 
-    object AdultBikes : ItemCategory("Adult bikes", Bikes,listOf(MountainBike),docName = "adultBikes")
-    object KidsBikes : ItemCategory("Kids bikes", Bikes,null,docName = "kidsBikes")
+    object AdultBikes : ItemCategory("Adult bikes", Bikes,listOf(MountainBike))
+    object KidsBikes : ItemCategory("Kids bikes", Bikes,null)
 
 
-    object MountainBike : ItemCategory("Mountain Bikes",Bikes,null,docName = "mountainBikes")
+    object MountainBike : ItemCategory("Mountain Bikes",Bikes,null)
 
+
+    private val listOfAllCategories = listOf(MainCategory,Kids,Sports,Bikes,Teamsports,Individualsports,Toys,Dolls,Cars,AdultBikes,KidsBikes,MountainBike)
 
     var currentCategory: ItemCategory = MainCategory
 
 
     fun isCategoryFinal(): Boolean {
-      return  currentCategory.children == null
+        return  currentCategory.children == null
     }
 
     fun pickCategory(pickedCategory: ItemCategory) {
         currentCategory = pickedCategory
     }
+/**
+    fun findCategoryFromDocumentReference(docRef : DocumentReference): ItemCategory {
+       return listOfAllCategories.first { it.docRef == docRef }
+    }
 
+    fun pickCategoryFromDocumentReference(docRef : DocumentReference) {
+       currentCategory = listOfAllCategories.first { it.docRef == docRef }
+    }*/
 }

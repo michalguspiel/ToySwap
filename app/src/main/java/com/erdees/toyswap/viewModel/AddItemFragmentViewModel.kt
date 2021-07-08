@@ -2,6 +2,7 @@ package com.erdees.toyswap.viewModel
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
 import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
@@ -69,10 +70,11 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
                 .map { it.second.toString() }
         val category = categoryLiveData.value!!
         val userId = getUserId()
+        Log.i("ITEMCATEGORY", "parent name = ${category.parent?.categoryName} , ${category.toFirebaseItemCategory()}")
         return itemRepository.addItemToFirebase(
             Item(
                 itemName,
-                category.documentRef(),
+                category.toFirebaseItemCategory(),
                 itemDesc,
                 itemSize,
                 itemCondition,
