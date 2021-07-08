@@ -2,6 +2,7 @@ package com.erdees.toyswap.view.fragments.dialogs
 
 import android.graphics.drawable.Icon
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,9 +33,9 @@ class ChooseCategoryDialog : DialogFragment() {
         _binding = DialogChooseCategoryBinding.inflate(inflater, container, false)
         val view = binding.root
         viewModel = ViewModelProvider(this).get(ChooseCategoryDialogViewModel::class.java)
-        //viewModel.resetCategory()
 
         categories = ItemCategories()
+        Log.i(TAG,categories.currentCategory.children!!.joinToString { it.parent?.categoryName.toString() })
         updateUi() // to initially draw categories.
 
 
@@ -52,7 +53,7 @@ class ChooseCategoryDialog : DialogFragment() {
 
     private fun updateUi() {
         binding.categoriesGridLayoutHolder.removeAllViews()
-        for (eachChild in categories.currentCategory.children!!) {// non nullable because its only get called after null check
+        for (eachChild in categories.currentCategory.children!!) {
             val eachCategoryCard =
                 LayoutInflater.from(requireContext()).inflate(R.layout.category_card, null, false)
             eachCategoryCard.findViewById<TextView>(R.id.categoryCardHead).text =
@@ -68,12 +69,14 @@ class ChooseCategoryDialog : DialogFragment() {
 
     }
 
+
     private fun setCategoryIcon(view: View, icon: Icon) {
-        view.findViewById<ImageView>(R.id.categoryIcon).setImageIcon(icon)
+      view.findViewById<ImageView>(R.id.categoryIcon).setImageIcon(icon)
 
     }
 
     private fun reactToCategoryPicked() {
+        Log.i(TAG,"current category = ${categories.currentCategory}")
         if (categories.isCategoryFinal()) viewModel.setCategory(categories.currentCategory)
         else updateUi()
     }

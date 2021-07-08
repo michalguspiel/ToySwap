@@ -69,12 +69,10 @@ class ItemFragment : Fragment() {
         val layout =
             LayoutInflater.from(requireContext()).inflate(R.layout.item_additional_info_box,null,false)
         val thisBinding = ItemAdditionalInfoBoxBinding.bind(layout)
-        item.category.get().addOnSuccessListener {
-            val categoryName = it["categoryName"].toString()
+              val categoryName = item.category.categoryName
             if(categoryName.isNotBlank() && categoryName != "null") {
                 thisBinding.itemAdditionalInfoBoxTV.text = categoryName
                 binding.additionalInformationLayout.addView(layout)
-            }
         }
     }
 

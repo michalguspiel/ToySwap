@@ -11,6 +11,9 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
+
+    useLibrary 'android.test.mock'
+
     defaultConfig {
         applicationId "com.erdees.toyswap"
         minSdkVersion 23
@@ -121,6 +124,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     testImplementation "org.robolectric:robolectric:4.4"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
     testImplementation "org.powermock:powermock-module-junit4:1.6.2"
     testImplementation "org.powermock:powermock-module-junit4-rule:1.6.2"
     testImplementation "org.powermock:powermock-api-mockito:1.6.2"
