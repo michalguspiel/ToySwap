@@ -6,40 +6,48 @@ package com.erdees.toyswap.model.models.item
  * or hard coded like this. Everything is in one place and I don't really see why this would have to be changed really often.
  * */
 
-class ItemCategories {
+class ItemCategoriesHandler {
 
-    object MainCategory : ItemCategory("MainCategory",null,listOf(Kids, Sports))
+    object MainCategory : ItemCategory("MainCategory",listOf(Kids, Sports))
     /**Main Categories*/
-    object Kids : ItemCategory("Kids", MainCategory, listOf(Toys))
-    object Sports : ItemCategory("Sport",MainCategory, listOf(Bikes, Teamsports, Individualsports))
+    object Kids : ItemCategory("Kids", listOf(Toys))
+    object Sports : ItemCategory("Sport", listOf(Bikes, Teamsports, Individualsports))
+
     /**Sub Categories*/
-    object Bikes : ItemCategory("Bikes", Sports, listOf(AdultBikes, KidsBikes))
-    object Teamsports : ItemCategory("Team sports", Sports, null)
-    object Individualsports : ItemCategory("Individual sports", Sports, null)
-    object Toys : ItemCategory("Toys", Kids, listOf(Cars, Dolls))
+    object Bikes : ItemCategory("Bikes", listOf(AdultBikes, KidsBikes))
+    object Teamsports : ItemCategory("Team sports", null)
+    object Individualsports : ItemCategory("Individual sports", null)
+    object Toys : ItemCategory("Toys", listOf(Cars, Dolls))
 
     /**Children categories*/
-    object Dolls : ItemCategory("Dolls", Toys, null)
-    object Cars : ItemCategory("Cars", Toys, null)
+    object Dolls : ItemCategory("Dolls", null)
+    object Cars : ItemCategory("Cars", null)
 
-    object AdultBikes : ItemCategory("Adult bikes", Bikes,listOf(MountainBike))
-    object KidsBikes : ItemCategory("Kids bikes", Bikes,null)
+    object AdultBikes : ItemCategory("Adult bikes",listOf(MountainBike))
+    object KidsBikes : ItemCategory("Kids bikes",null)
 
 
-    object MountainBike : ItemCategory("Mountain Bikes",Bikes,null)
+    object MountainBike : ItemCategory("Mountain Bikes",null)
 
 
     private val listOfAllCategories = listOf(MainCategory,Kids,Sports,Bikes,Teamsports,Individualsports,Toys,Dolls,Cars,AdultBikes,KidsBikes,MountainBike)
 
     var currentCategory: ItemCategory = MainCategory
 
+    var categoriesStack : List<ItemCategory> = listOf()
 
-    fun isCategoryFinal(): Boolean {
+    fun isCurrentCategoryFinal(): Boolean {
         return  currentCategory.children == null
     }
 
     fun pickCategory(pickedCategory: ItemCategory) {
+        categoriesStack = categoriesStack + currentCategory
         currentCategory = pickedCategory
+    }
+
+    fun pickPreviousCategory(){
+        currentCategory = categoriesStack.last()
+        categoriesStack = categoriesStack - categoriesStack.last()
     }
 /**
     fun findCategoryFromDocumentReference(docRef : DocumentReference): ItemCategory {

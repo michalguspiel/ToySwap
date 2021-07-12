@@ -2,6 +2,7 @@ package com.erdees.toyswap.view.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.R
@@ -29,7 +30,12 @@ class MainActivity : AppCompatActivity() {
     private var isUserLoggedOut : Boolean = false
 
     override fun onBackPressed() {
-        if(this.supportFragmentManager.backStackEntryCount == 1) this.finish()
+        Log.i(TAG,addFragment.chooseCategoryDialog.isVisible.toString() + addFragment.chooseCategoryDialog.tag)
+        if(addFragment.chooseCategoryDialog.isVisible){
+            Log.i(TAG,"Choose category dialog was visible!")
+        viewModel.pickPreviousCategory()
+        }
+        else if(this.supportFragmentManager.backStackEntryCount == 1) this.finish()
         else super.onBackPressed()
     }
 

@@ -6,7 +6,7 @@ import com.google.firebase.ktx.Firebase
 
 data class Item(
     val name: String = "",
-    val category: ItemCategoryFirebase = ItemCategoryFirebase("",null,null,
+    val category: ItemCategoryFirebase = ItemCategoryFirebase("",null,
         Firebase.firestore.document("")),
     val description: String = "",
     val size : String = "",
