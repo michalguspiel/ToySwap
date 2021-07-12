@@ -17,7 +17,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
-import com.erdees.toyswap.model.Constants
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
 import com.erdees.toyswap.Utils.disable
@@ -27,6 +26,7 @@ import com.erdees.toyswap.Utils.postRxValueBasedOnEditText
 import com.erdees.toyswap.Utils.setMargins
 import com.erdees.toyswap.databinding.FragmentAddItemBinding
 import com.erdees.toyswap.databinding.PictureGridItemBinding
+import com.erdees.toyswap.model.Constants
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
 import com.erdees.toyswap.view.fragments.dialogs.PicturePreviewDialog
 import com.erdees.toyswap.viewModel.AddItemFragmentViewModel
@@ -50,7 +50,7 @@ class AddItemFragment : Fragment() {
 
     private lateinit var alertDialog: AlertDialog
 
-    private val chooseCategoryDialog by lazy {
+     val chooseCategoryDialog by lazy {
         ChooseCategoryDialog.newInstance()
     }
 
@@ -65,6 +65,11 @@ class AddItemFragment : Fragment() {
     private var isNameProvided = false
     private var isDescProvided = false
     private var isPriceProvided = false
+
+    override fun onResume() {
+        Log.i(TAG,"on resume")
+        super.onResume()
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -100,7 +105,7 @@ class AddItemFragment : Fragment() {
         })
 
         binding.itemChooseCategoryBtn.setOnClickListener {
-            chooseCategoryDialog.show(childFragmentManager, ChooseCategoryDialog.TAG)
+            chooseCategoryDialog.show(parentFragmentManager, ChooseCategoryDialog.TAG)
         }
 
         binding.itemAddPictureBtn.setOnClickListener {
