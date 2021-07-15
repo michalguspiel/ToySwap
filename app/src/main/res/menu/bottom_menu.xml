@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Home"
+    <item android:title="@string/home"
         android:id="@+id/nav_mainFragment"
         android:icon="@drawable/ic_baseline_home_24"/>
-    <item android:title="Account"
+    <item android:title="@string/account"
         android:id="@+id/nav_myAccountFragment"
         android:icon="@drawable/ic_baseline_person_24"/>
-    <item android:title="Add"
+    <item android:title="@string/add"
         android:id="@+id/nav_addItemFragment"
         android:icon="@drawable/ic_baseline_add_box_24"/>
-    <item android:title="Messages"
+    <item android:title="@string/messages"
         android:id="@+id/nav_messagesFragment"
         android:icon="@drawable/ic_baseline_person_24"/>
-    <item android:title="Items"
+    <item android:title="@string/my_items"
         android:id="@+id/nav_inventoryFragment"
         android:icon="@drawable/ic_baseline_home_24" />
 </menu>

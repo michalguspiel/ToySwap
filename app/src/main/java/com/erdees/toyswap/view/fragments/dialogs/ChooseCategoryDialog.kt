@@ -12,20 +12,23 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils.ignoreFirst
+import com.erdees.toyswap.Utils.makeGone
+import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.databinding.DialogChooseCategoryBinding
 import com.erdees.toyswap.model.models.item.ItemCategoriesHandler
+import com.erdees.toyswap.model.models.item.ItemCategory
 import com.erdees.toyswap.viewModel.ChooseCategoryDialogViewModel
-
-/**
- * TODO OVERRIDE BACK BUTTON WHEN THIS IS SHOWN AND USER PRESSES BACK BUTTON PREVIOUS CATEGORY MUST BE PICKED IF THERE IS NOT ANY THEN SUPER.ONBACKPRESSED.
- * */
 
 
 class ChooseCategoryDialog : DialogFragment() {
+
+
     private var _binding: DialogChooseCategoryBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var viewModel: ChooseCategoryDialogViewModel
+
+    private lateinit var currentCategory: ItemCategory
 
 
     override fun onCreateView(
@@ -38,16 +41,20 @@ class ChooseCategoryDialog : DialogFragment() {
         viewModel = ViewModelProvider(this).get(ChooseCategoryDialogViewModel::class.java)
 
 
-
         viewModel.categoryLiveData.ignoreFirst().observe(viewLifecycleOwner, { category ->
             if (category != null) this.dismiss()
         })
 
-        viewModel.categoriesLiveData.observe(viewLifecycleOwner,{ itemCategories ->
+        viewModel.categoriesLiveData.observe(viewLifecycleOwner, { itemCategories ->
             updateUi(itemCategories)
+            currentCategory = itemCategories.currentCategory
+            if (isCurrentCategoryMainCategory()) binding.chooseCategoryBackBtn.makeGone()
+            else binding.chooseCategoryBackBtn.makeVisible()
         })
 
-
+        binding.chooseCategoryBackBtn.setOnClickListener {
+            viewModel.pickPreviousCategory()
+        }
 
         return view
     }
@@ -56,6 +63,7 @@ class ChooseCategoryDialog : DialogFragment() {
         const val TAG = "ChooseCategoryDialog"
         fun newInstance(): ChooseCategoryDialog = ChooseCategoryDialog()
     }
+
 
     private fun updateUi(categoriesHandler: ItemCategoriesHandler) {
         binding.categoriesGridLayoutHolder.removeAllViews()
@@ -67,7 +75,8 @@ class ChooseCategoryDialog : DialogFragment() {
             if (eachChild.icon != null) setCategoryIcon(eachCategoryCard, eachChild.icon)
             eachCategoryCard.setOnClickListener {
                 viewModel.pickCategory(eachChild)
-                binding.dialogChooseCategoryHead.text = categoriesHandler.currentCategory.categoryName
+                binding.dialogChooseCategoryHead.text =
+                    categoriesHandler.currentCategory.categoryName
             }
             binding.categoriesGridLayoutHolder.addView(eachCategoryCard)
         }
@@ -75,7 +84,12 @@ class ChooseCategoryDialog : DialogFragment() {
     }
 
     private fun setCategoryIcon(view: View, icon: Icon) {
-      view.findViewById<ImageView>(R.id.categoryIcon).setImageIcon(icon)
+        view.findViewById<ImageView>(R.id.categoryIcon).setImageIcon(icon)
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        viewModel.clearItemCategoriesHandler()
+        super.onCancel(dialog)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -83,5 +97,8 @@ class ChooseCategoryDialog : DialogFragment() {
         super.onDismiss(dialog)
     }
 
+    private fun isCurrentCategoryMainCategory(): Boolean {
+        return currentCategory == ItemCategoriesHandler.MainCategory
+    }
 
 }

@@ -19,7 +19,6 @@ class MainActivityViewModel(application: Application): AndroidViewModel(applicat
     }
 
 
-    fun pickPreviousCategory() = categoryRepository.pickPreviousCategory()
 
     val userLiveData = authUserRepository.getUserLiveData()
     val isUserLoggedOut = authUserRepository.getIsUserLoggedOutLiveData()
