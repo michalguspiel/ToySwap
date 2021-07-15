@@ -12,8 +12,6 @@ class CategoryRepository {
     private var itemCategoriesHandler = ItemCategoriesHandler()
     private val itemCategoriesHandlerLiveData = MutableLiveData<ItemCategoriesHandler>()
 
-
-
     init {
         chosenCategoryLiveData.value = mutableCategory
         itemCategoriesHandlerLiveData.value = itemCategoriesHandler
@@ -48,6 +46,7 @@ class CategoryRepository {
     fun getCategoryLiveData() = chosenCategoryLiveData
 
     fun getCategoriesLiveData() = itemCategoriesHandlerLiveData
+
 
     /**Singleton*/
     companion object {

@@ -17,4 +17,7 @@ class ChooseCategoryDialogViewModel : ViewModel() {
 
     fun pickCategory(category: ItemCategory?) = categoryRepository.pickCategory(category)
 
+    fun pickPreviousCategory() = categoryRepository.pickPreviousCategory()
+
+
 }

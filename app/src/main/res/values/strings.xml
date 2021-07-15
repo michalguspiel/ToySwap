@@ -21,4 +21,10 @@
     <string name="user_reputation">User reputation:</string>
     <string name="seller_avatar">seller avatar</string>
     <string name="in_toyswap_since">In Toyswap since</string>
+    <string name="home">Home</string>
+    <string name="account">Account</string>
+    <string name="add">Add</string>
+    <string name="messages">Messages</string>
+    <string name="my_items">My Items</string>
+    <string name="my_listed_items">My listed items</string>
 </resources>
