@@ -9,8 +9,15 @@ class ChooseCategoryDialogViewModel : ViewModel() {
 
     private val categoryRepository = CategoryRepository.getInstance()
 
-    fun setCategory(category: ItemCategory?) = categoryRepository.updateChosenCategory(category)
+    fun clearItemCategoriesHandler() = categoryRepository.clearItemCategoriesHandler()
 
     val categoryLiveData = categoryRepository.getCategoryLiveData()
+
+    val categoriesLiveData = categoryRepository.getCategoriesLiveData()
+
+    fun pickCategory(category: ItemCategory?) = categoryRepository.pickCategory(category)
+
+    fun pickPreviousCategory() = categoryRepository.pickPreviousCategory()
+
 
 }

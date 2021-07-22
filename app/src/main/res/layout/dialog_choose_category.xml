@@ -27,4 +27,13 @@
         android:layout_height="wrap_content" />
 
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/chooseCategoryBackBtn"
+        android:text="Back"
+        android:layout_gravity="center"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="8dp"/>
+
 </LinearLayout>

@@ -1,13 +1,13 @@
 package com.erdees.toyswap.model.models.item
 
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 data class Item(
     val name: String = "",
-    val category: DocumentReference = Firebase.firestore.collection("itemCategories").document(),
+    val category: ItemCategoryFirebase = ItemCategoryFirebase("",null,
+        Firebase.firestore.document("")),
     val description: String = "",
     val size : String = "",
     val itemCondition: String = "",

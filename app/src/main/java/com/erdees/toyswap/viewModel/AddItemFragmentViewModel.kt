@@ -37,7 +37,7 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
 
     val categoryLiveData = categoryRepository.getCategoryLiveData()
 
-    fun clearCategory() = categoryRepository.updateChosenCategory(null)
+    fun clearCategory() = categoryRepository.clearCategory()
 
     fun addPicture(uri: Uri) = picturesRepository.addPicture(uri)
 
@@ -72,7 +72,7 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
         return itemRepository.addItemToFirebase(
             Item(
                 itemName,
-                category.documentRef(),
+                category.toFirebaseItemCategory(),
                 itemDesc,
                 itemSize,
                 itemCondition,

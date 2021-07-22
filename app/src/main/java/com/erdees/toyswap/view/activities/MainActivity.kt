@@ -2,15 +2,13 @@ package com.erdees.toyswap.view.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.R
 import com.erdees.toyswap.Utils
 import com.erdees.toyswap.databinding.ActivityMainBinding
-import com.erdees.toyswap.view.fragments.AddItemFragment
-import com.erdees.toyswap.view.fragments.BrowserFragment
-import com.erdees.toyswap.view.fragments.ChatFragment
-import com.erdees.toyswap.view.fragments.MyAccountFragment
+import com.erdees.toyswap.view.fragments.*
 import com.erdees.toyswap.viewModel.MainActivityViewModel
 import com.google.firebase.auth.FirebaseUser
 
@@ -21,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private val myAccountFragment = MyAccountFragment.newInstance()
     private val addFragment = AddItemFragment.newInstance()
     private val chatFragment = ChatFragment.newInstance()
+    private val myItemsFragment = MyItemsFragment.newInstance()
 
     private lateinit var viewModel : MainActivityViewModel
     private lateinit var viewBinding: ActivityMainBinding
@@ -28,8 +27,14 @@ class MainActivity : AppCompatActivity() {
     private var currentUser: FirebaseUser? = null
     private var isUserLoggedOut : Boolean = false
 
+    private var isCategoryDialogOpened : Boolean? = null
+
     override fun onBackPressed() {
-        if(this.supportFragmentManager.backStackEntryCount == 1) this.finish()
+        Log.i(TAG,isChooseCategoryDialogVisible().toString())
+        if(isChooseCategoryDialogVisible() == true){
+            Log.i(TAG,"CategoryDialogWasOpen")
+        }
+        else if(this.supportFragmentManager.backStackEntryCount == 1) this.finish()
         else super.onBackPressed()
     }
 
@@ -40,6 +45,8 @@ class MainActivity : AppCompatActivity() {
         val view = viewBinding.root
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         setContentView(view)
+
+
 
         viewModel.userLiveData.observe(this,  {
             currentUser = it
@@ -68,6 +75,10 @@ class MainActivity : AppCompatActivity() {
                          ChatFragment.TAG,supportFragmentManager)
                     else  openLoginActivity()
                 }
+                R.id.nav_inventoryFragment -> {
+                    if(!isUserLoggedOut)Utils.openFragment(myItemsFragment,MyItemsFragment.TAG,supportFragmentManager)
+                    else openLoginActivity()
+                }
                 else -> {}
             }
             true
@@ -76,6 +87,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+    private fun isChooseCategoryDialogVisible(): Boolean?{
+       return isCategoryDialogOpened
+    }
     private fun openLoginActivity(){
         val loginActivity = Intent(this, LoginActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)

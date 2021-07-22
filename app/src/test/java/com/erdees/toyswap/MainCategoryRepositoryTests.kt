@@ -1,7 +1,7 @@
 package com.erdees.toyswap
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.erdees.toyswap.model.models.item.ItemCategories
+import com.erdees.toyswap.model.models.item.ItemCategoriesHandler
 import com.erdees.toyswap.viewModel.ChooseCategoryDialogViewModel
 import junit.framework.Assert.assertEquals
 import org.junit.After
@@ -37,8 +37,8 @@ class MainCategoryRepositoryTests {
 
     @Test
     fun `Given I just changed categoryLivedata value for dolls viewmodel getCategoryLiveData should return dolls`(){
-        viewModel.setCategory(ItemCategories.Dolls)
-        assertEquals(ItemCategories.Dolls,viewModel.categoryLiveData.value)
+        viewModel.setCategory(ItemCategoriesHandler.Dolls)
+        assertEquals(ItemCategoriesHandler.Dolls,viewModel.categoryLiveData.value)
     }
 
 
