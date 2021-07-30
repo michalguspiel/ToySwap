@@ -24,6 +24,10 @@ import java.util.*
 
 class ItemFragment : Fragment() {
 
+    /**TODO : Making an offer feature,
+     *  buying with delivery?(no idea how this will work),
+     *  implement recycler on bottom where user sees other items*/
+
     private var _binding: FragmentItemBinding? = null
     private val binding get() = _binding!!
 
