@@ -12,6 +12,8 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.ProgressBar
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -22,11 +24,14 @@ import com.erdees.toyswap.Utils
 import com.erdees.toyswap.Utils.disable
 import com.erdees.toyswap.Utils.enable
 import com.erdees.toyswap.Utils.makeGone
+import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.Utils.postRxValueBasedOnEditText
 import com.erdees.toyswap.Utils.setMargins
 import com.erdees.toyswap.databinding.FragmentAddItemBinding
 import com.erdees.toyswap.databinding.PictureGridItemBinding
 import com.erdees.toyswap.model.Constants
+import com.erdees.toyswap.model.models.item.ItemConditions
+import com.erdees.toyswap.model.models.item.PickupOption
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
 import com.erdees.toyswap.view.fragments.dialogs.PicturePreviewDialog
 import com.erdees.toyswap.viewModel.AddItemFragmentViewModel
@@ -36,8 +41,7 @@ import com.theartofdev.edmodo.cropper.CropImage
 import io.reactivex.rxjava3.subjects.PublishSubject
 
 
-class AddItemFragment : Fragment() {
-
+class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
 
     private var _binding: FragmentAddItemBinding? = null
     private val binding get() = _binding!!
@@ -50,24 +54,44 @@ class AddItemFragment : Fragment() {
 
     private lateinit var alertDialog: AlertDialog
 
-     val chooseCategoryDialog by lazy {
+    private val chooseCategoryDialog by lazy {
         ChooseCategoryDialog.newInstance()
     }
+
+    private val conditionList = ItemConditions().listOfItemConditions
+    private var chosenCondition: String = ""
 
     private val isPictureProvidedRX = PublishSubject.create<Boolean>()
     private val isCategoryProvidedRX = PublishSubject.create<Boolean>()
     private val isNameProvidedRX = PublishSubject.create<Boolean>()
     private val isDescProvidedRX = PublishSubject.create<Boolean>()
     private val isPriceProvidedRX = PublishSubject.create<Boolean>()
+    private val isShipmentAndOptionRX = PublishSubject.create<Boolean>()
+    private val isDeliveryPriceProvidedRX = PublishSubject.create<Boolean>()
+    private val isPersonalPickupAnOptionRX = PublishSubject.create<Boolean>()
+    private val isItemConditionPickedRX = PublishSubject.create<Boolean>()
 
     private var isPictureProvided = false
     private var isCategoryProvided = false
     private var isNameProvided = false
     private var isDescProvided = false
     private var isPriceProvided = false
+    private var isShipmentAnOption = false
+    private var isDeliveryPriceProvided = false
+    private var isPersonalPickupAnOption = false
+    private var isItemConditionPicked = false
 
     override fun onResume() {
-        Log.i(TAG,"on resume")
+        val spinnerAdapter = ArrayAdapter(
+            requireActivity(),
+            R.layout.support_simple_spinner_dropdown_item,
+            conditionList.map { it.name })
+        with(binding.itemConditionSpinner) {
+            setSelection(0)
+            setAdapter(spinnerAdapter)
+            onItemClickListener = this@AddItemFragment
+            gravity = Gravity.CENTER
+        }
         super.onResume()
     }
 
@@ -122,6 +146,17 @@ class AddItemFragment : Fragment() {
             if (it != null) isPriceProvidedRX.postRxValueBasedOnEditText(it)
         }
 
+        binding.itemDeliveryPriceInput.addTextChangedListener {
+            if (it != null) isDeliveryPriceProvidedRX.postRxValueBasedOnEditText(it)
+        }
+
+        binding.delivery.setOnCheckedChangeListener { _, isChecked ->
+            isShipmentAndOptionRX.onNext(isChecked)
+        }
+
+        binding.personalPickup.setOnCheckedChangeListener { _, isChecked ->
+            isPersonalPickupAnOptionRX.onNext(isChecked)
+        }
 
         binding.submitItemButton.setOnClickListener {
             viewModel.addPicturesToCloud()
@@ -132,7 +167,7 @@ class AddItemFragment : Fragment() {
                         cloudUriList.isNotEmpty() &&
                         clientUriList.isNotEmpty()
                     ) addThisItemToFirebase().addOnSuccessListener {
-                        Log.i(TAG, "Item added succesfully!")
+                        Log.i(TAG, "Item added successfully!")
                         viewModel.clearPicturesData()
                         endLoadingAndContinue()
                     }
@@ -165,96 +200,146 @@ class AddItemFragment : Fragment() {
             ifAllDataIsProvidedEnableSubmitButton()
         }
 
+        isShipmentAndOptionRX.subscribe {
+            isShipmentAnOption = it
+            if (isShipmentAnOption) binding.itemDeliveryPriceLayout.makeVisible()
+            else binding.itemDeliveryPriceLayout.makeGone()
+            ifAllDataIsProvidedEnableSubmitButton()
+        }
+
+        isPersonalPickupAnOptionRX.subscribe {
+            isPersonalPickupAnOption = it
+            ifAllDataIsProvidedEnableSubmitButton()
+        }
+
+        isDeliveryPriceProvidedRX.subscribe {
+            isDeliveryPriceProvided = it
+            ifAllDataIsProvidedEnableSubmitButton()
+        }
+
+        isItemConditionPickedRX.subscribe {
+            isItemConditionPicked = it
+            ifAllDataIsProvidedEnableSubmitButton()
+        }
 
         return view
     }
 
-    private fun showLoadingDialog(){
+    private fun showLoadingDialog() {
         alertDialog = AlertDialog.Builder(requireContext())
             .setView(ProgressBar(requireContext()))
             .setMessage("Adding your item...")
             .show()
     }
 
-    private fun showSuccessDialog(){
+    private fun showSuccessDialog() {
         alertDialog = AlertDialog.Builder(requireContext())
             .setMessage("Your item was added successfully!")
-            .setPositiveButton("Show added item",null)
-            .setNegativeButton("Back",null)
+            .setPositiveButton("Show added item", null)
+            .setNegativeButton("Back", null)
             .show()
 
-    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-        TODO("When this is clicked [ItemFragment] with just added item should be opened, I'll leave this todo in here since I don't have [ItemFragment yet].")
-    }
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            TODO("When this is clicked [ItemFragment] with just added item should be opened, I'll leave this todo in here since I don't have [ItemFragment yet].")
+        }
     }
 
-    private fun endLoadingAndShowFailureDialog(){
+    private fun endLoadingAndShowFailureDialog() {
         alertDialog = AlertDialog.Builder(requireContext())
             .setMessage("Oops.. something went wrong your item wasn't added.")
-            .setNegativeButton("Back",null)
+            .setNegativeButton("Back", null)
             .show()
     }
 
-    private fun endLoadingAndContinue(){
+    private fun endLoadingAndContinue() {
         endLoading()
         clearAddedItemData()
         showSuccessDialog()
     }
 
-    private fun clearAddedItemData(){
+    private fun clearAddedItemData() {
         binding.itemNameInput.text?.clear()
         binding.itemDescInput.text?.clear()
         binding.itemPriceInput.text?.clear()
         viewModel.clearCategory()
     }
 
-    private fun endLoading(){
+    private fun endLoading() {
         alertDialog.dismiss()
     }
 
+    private fun isAnyPickupOptionChecked(): Boolean {
+        return (isShipmentAnOption || isPersonalPickupAnOption)
+    }
+
+    private fun isShipmentDataProvidedIfNecessary(): Boolean {
+        return if (!isShipmentAnOption) true
+        else (isShipmentAnOption && isDeliveryPriceProvided)
+    }
+
     private fun ifAllDataIsProvidedEnableSubmitButton() {
-        if (isPictureProvided && isCategoryProvided && isNameProvided && isPriceProvided && isDescProvided){
+        if (isPictureProvided &&
+            isCategoryProvided &&
+            isNameProvided &&
+            isPriceProvided &&
+            isDescProvided &&
+            isItemConditionPicked &&
+            isShipmentDataProvidedIfNecessary() &&
+            isAnyPickupOptionChecked()
+        ) {
             binding.submitItemButton.enable()
             clearErrorTextView()
-        }
-        else {
+        } else {
             binding.submitItemButton.disable()
             setSubmitErrorTextView()
         }
     }
 
-    private fun clearErrorTextView(){
+    private fun clearErrorTextView() {
         binding.submitErrorTextView.text = ""
     }
 
-    private fun setSubmitErrorTextView(){
-        val list = listOf(isNameProvided,isDescProvided,isPriceProvided,isPictureProvided,isCategoryProvided).filter { !it }
-        if(list.size > 1) binding.submitErrorTextView.text = getString(R.string.provideAllData)
+    private fun setSubmitErrorTextView() {
+        val list = listOf(
+            isNameProvided,
+            isDescProvided,
+            isPriceProvided,
+            isPictureProvided,
+            isCategoryProvided,
+            isItemConditionPicked,
+            isShipmentDataProvidedIfNecessary(),
+            isAnyPickupOptionChecked()
+        ).filter { !it }
+        if (list.size > 1) binding.submitErrorTextView.text = getString(R.string.provideAllData)
         else binding.submitErrorTextView.text = findErrorMessage()
     }
 
-    private fun findErrorMessage(): String{
-        return when{
+    private fun findErrorMessage(): String {
+        return when {
             !isNameProvided -> "Item name must be provided."
             !isDescProvided -> "Item description must be provided."
             !isPriceProvided -> "Item price must be provided."
             !isPictureProvided -> "Item must have at least 1 picture."
             !isCategoryProvided -> "Item must have category."
+            !isItemConditionPicked -> "Item condition must be provided."
+            !isShipmentDataProvidedIfNecessary() -> "You must provide delivery price."
+            !isAnyPickupOptionChecked() -> "At least one pickup option must be chosen."
             else -> ""
         }
     }
 
     private fun addThisItemToFirebase(): Task<DocumentReference> {
+        val pickupOptions = mutableListOf<PickupOption>()
+        if (isShipmentAnOption) pickupOptions.add(Constants.shipment)
+        if (isPersonalPickupAnOption) pickupOptions.add(Constants.personalPickup)
         return viewModel.addItemToFirebase(
             binding.itemNameInput.text.toString(),
             binding.itemDescInput.text.toString(),
             binding.itemPriceInput.text.toString().toDouble(),
-            99.9,
-            "Used",
-            "52"
-            //binding.itemDeliveryCost.text.toString().toDouble(), // todo add this to UI and connect with this fields
-        //binding.itemCondition.text.toString(),
-        //binding.itemSize.text.toString()
+            binding.itemDeliveryPriceInput.text.toString().toDouble(),
+            chosenCondition,
+            binding.itemSizeInput.text.toString(),
+            pickupOptions
         )
     }
 
@@ -398,5 +483,10 @@ class AddItemFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        chosenCondition = conditionList[position].name
+        isItemConditionPickedRX.onNext(true)
     }
 }

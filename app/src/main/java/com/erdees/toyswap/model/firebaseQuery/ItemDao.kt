@@ -45,6 +45,7 @@ class ItemDao {
        return db.collection("items").add(Item)
     }
 
+
     fun getPresentedItem() = itemLiveData
 
     fun setItemToPresent(itemToPresent: Item) {
