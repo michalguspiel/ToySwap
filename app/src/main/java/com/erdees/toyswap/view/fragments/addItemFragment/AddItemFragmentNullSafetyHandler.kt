@@ -1,4 +1,4 @@
-package com.erdees.toyswap.view.fragments
+package com.erdees.toyswap.view.fragments.addItemFragment
 
 import android.content.Context
 import com.erdees.toyswap.R
