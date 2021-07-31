@@ -8,6 +8,7 @@ import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
 import com.erdees.toyswap.model.firebaseQuery.ItemDao
 import com.erdees.toyswap.model.firebaseQuery.ItemRepository
 import com.erdees.toyswap.model.models.item.Item
+import com.erdees.toyswap.model.models.item.PickupOption
 import com.erdees.toyswap.model.repositories.CategoryRepository
 import com.erdees.toyswap.model.repositories.PicturesRepository
 import com.google.android.gms.tasks.Task
@@ -58,9 +59,10 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
         itemName: String,
         itemDesc: String,
         itemPrice: Double,
-        deliveryPrice: Double,
+        deliveryPrice: Double?,
         itemCondition : String,
-        itemSize: String
+        itemSize: String,
+        pickupOptions:List<PickupOption>
     ): Task<DocumentReference> {
         val mainPic =
             getUriOfPicsInCloudLiveData().value?.first { it.first == 0 }?.second.toString() // MAIN PIC MUST EXIST
@@ -77,6 +79,7 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
                 itemSize,
                 itemCondition,
                 itemPrice,
+                pickupOptions,
                 deliveryPrice,
                 mainPic,
                 otherPics,
@@ -86,4 +89,7 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
             )
         )
     }
+
+    fun setItemToPresent(item: Item) = itemRepository.setItemToPresent(item)
+
 }

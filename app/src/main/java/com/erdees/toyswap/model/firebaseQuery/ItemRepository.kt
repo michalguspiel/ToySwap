@@ -12,7 +12,10 @@ class ItemRepository(private val dao: ItemDao) {
       return dao.getOptions(viewLifecycleOwner)
     }
 
+
     fun addItemToFirebase(item: Item):Task<DocumentReference> = dao.addItemToFirebase(item)
+
+
 
     fun getPresentedItem() = dao.getPresentedItem()
 

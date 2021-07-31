@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="personal_pickup">Personal pickup</string>
+    <string name="shipment">Shipment</string>
+</resources>

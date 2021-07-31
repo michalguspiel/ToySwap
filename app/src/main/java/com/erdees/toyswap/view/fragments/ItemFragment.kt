@@ -24,6 +24,10 @@ import java.util.*
 
 class ItemFragment : Fragment() {
 
+    /**TODO : Making an offer feature,
+     *  buying with delivery?(no idea how this will work),
+     *  implement recycler on bottom where user sees other items*/
+
     private var _binding: FragmentItemBinding? = null
     private val binding get() = _binding!!
 
@@ -56,7 +60,8 @@ class ItemFragment : Fragment() {
         binding.itemPrice.text = NumberFormat.getCurrencyInstance(Locale.FRANCE).format(item.price)
         setItemAdditionalInformation(item)
         binding.itemTimestamp.text = item.timeStamp.toDate().toString()
-        binding.deliveryPrice.text = NumberFormat.getCurrencyInstance(Locale.FRANCE).format(item.deliveryCost)
+        if(item.deliveryCost != null) binding.deliveryPrice.text = NumberFormat.getCurrencyInstance(Locale.FRANCE).format(item.deliveryCost)
+
     }
 
     private fun setItemAdditionalInformation(item: Item) {

@@ -27,4 +27,7 @@
     <string name="messages">Messages</string>
     <string name="my_items">My Items</string>
     <string name="my_listed_items">My listed items</string>
+    <string name="personal_pickup">Personal pickup</string>
+    <string name="shipment">Shipment</string>
+    <string name="item_added_successfully">Your item was posted successfully!</string>
 </resources>
