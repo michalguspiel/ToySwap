@@ -1,4 +1,4 @@
-package com.erdees.toyswap.view.fragments
+package com.erdees.toyswap.view.fragments.addItemFragment
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -30,6 +30,7 @@ import com.erdees.toyswap.model.Constants
 import com.erdees.toyswap.model.models.item.Item
 import com.erdees.toyswap.model.models.item.ItemConditions
 import com.erdees.toyswap.model.models.item.PickupOption
+import com.erdees.toyswap.view.fragments.ItemFragment
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
 import com.erdees.toyswap.view.fragments.dialogs.PicturePreviewDialog
 import com.erdees.toyswap.viewModel.AddItemFragmentViewModel

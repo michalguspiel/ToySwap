@@ -1,8 +1,6 @@
 package com.erdees.toyswap.model.models.item
 
-class ItemCondition(val name: String) {
-
-}
+class ItemCondition(val name: String)
 
 class ItemConditions{
 
