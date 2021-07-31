@@ -60,7 +60,8 @@ class ItemFragment : Fragment() {
         binding.itemPrice.text = NumberFormat.getCurrencyInstance(Locale.FRANCE).format(item.price)
         setItemAdditionalInformation(item)
         binding.itemTimestamp.text = item.timeStamp.toDate().toString()
-        binding.deliveryPrice.text = NumberFormat.getCurrencyInstance(Locale.FRANCE).format(item.deliveryCost)
+        if(item.deliveryCost != null) binding.deliveryPrice.text = NumberFormat.getCurrencyInstance(Locale.FRANCE).format(item.deliveryCost)
+
     }
 
     private fun setItemAdditionalInformation(item: Item) {

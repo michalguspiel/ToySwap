@@ -59,7 +59,7 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
         itemName: String,
         itemDesc: String,
         itemPrice: Double,
-        deliveryPrice: Double,
+        deliveryPrice: Double?,
         itemCondition : String,
         itemSize: String,
         pickupOptions:List<PickupOption>
@@ -89,5 +89,7 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
             )
         )
     }
+
+    fun setItemToPresent(item: Item) = itemRepository.setItemToPresent(item)
 
 }

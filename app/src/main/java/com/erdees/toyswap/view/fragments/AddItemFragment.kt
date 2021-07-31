@@ -6,10 +6,7 @@ import android.app.AlertDialog
 import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
@@ -30,6 +27,7 @@ import com.erdees.toyswap.Utils.setMargins
 import com.erdees.toyswap.databinding.FragmentAddItemBinding
 import com.erdees.toyswap.databinding.PictureGridItemBinding
 import com.erdees.toyswap.model.Constants
+import com.erdees.toyswap.model.models.item.Item
 import com.erdees.toyswap.model.models.item.ItemConditions
 import com.erdees.toyswap.model.models.item.PickupOption
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
@@ -38,10 +36,10 @@ import com.erdees.toyswap.viewModel.AddItemFragmentViewModel
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.theartofdev.edmodo.cropper.CropImage
-import io.reactivex.rxjava3.subjects.PublishSubject
 
 
 class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
+
 
     private var _binding: FragmentAddItemBinding? = null
     private val binding get() = _binding!!
@@ -61,25 +59,7 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
     private val conditionList = ItemConditions().listOfItemConditions
     private var chosenCondition: String = ""
 
-    private val isPictureProvidedRX = PublishSubject.create<Boolean>()
-    private val isCategoryProvidedRX = PublishSubject.create<Boolean>()
-    private val isNameProvidedRX = PublishSubject.create<Boolean>()
-    private val isDescProvidedRX = PublishSubject.create<Boolean>()
-    private val isPriceProvidedRX = PublishSubject.create<Boolean>()
-    private val isShipmentAndOptionRX = PublishSubject.create<Boolean>()
-    private val isDeliveryPriceProvidedRX = PublishSubject.create<Boolean>()
-    private val isPersonalPickupAnOptionRX = PublishSubject.create<Boolean>()
-    private val isItemConditionPickedRX = PublishSubject.create<Boolean>()
-
-    private var isPictureProvided = false
-    private var isCategoryProvided = false
-    private var isNameProvided = false
-    private var isDescProvided = false
-    private var isPriceProvided = false
-    private var isShipmentAnOption = false
-    private var isDeliveryPriceProvided = false
-    private var isPersonalPickupAnOption = false
-    private var isItemConditionPicked = false
+    private val nsh = AddItemFragmentNullSafetyHandler()
 
     override fun onResume() {
         val spinnerAdapter = ArrayAdapter(
@@ -111,19 +91,18 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
                 Log.i(TAG, "Picked category  = ${it.categoryName}")
                 binding.itemChosenCategory.text = it.categoryName
                 binding.itemChooseCategoryBtn.text = getString(R.string.change_category)
-                isCategoryProvidedRX.onNext(true)
+                nsh.isCategoryProvidedRX.onNext(true)
             }
             if (it == null) {
-                isCategoryProvidedRX.onNext(false)
+                nsh.isCategoryProvidedRX.onNext(false)
                 binding.itemChosenCategory.text = ""
                 binding.itemChooseCategoryBtn.text = getString(R.string.pick_category)
             }
         })
 
         viewModel.picturesLiveData.observe(viewLifecycleOwner, { picList ->
-            if (picList.isNotEmpty()) isPictureProvidedRX.onNext(true) else isPictureProvidedRX.onNext(
-                false
-            )
+            if (picList.isNotEmpty()) nsh.isPictureProvidedRX.onNext(true)
+            else nsh.isPictureProvidedRX.onNext(false)
             binding.itemAddPictureBtn.isEnabled = picList.size < 6
             buildPictureGridLayout(picList)
         })
@@ -137,30 +116,29 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
         }
 
         binding.itemNameInput.addTextChangedListener {
-            if (it != null) isNameProvidedRX.postRxValueBasedOnEditText(it)
+            if (it != null) nsh.isNameProvidedRX.postRxValueBasedOnEditText(it)
         }
         binding.itemDescInput.addTextChangedListener {
-            if (it != null) isDescProvidedRX.postRxValueBasedOnEditText(it)
+            if (it != null) nsh.isDescProvidedRX.postRxValueBasedOnEditText(it)
         }
         binding.itemPriceInput.addTextChangedListener {
-            if (it != null) isPriceProvidedRX.postRxValueBasedOnEditText(it)
+            if (it != null) nsh.isPriceProvidedRX.postRxValueBasedOnEditText(it)
         }
-
         binding.itemDeliveryPriceInput.addTextChangedListener {
-            if (it != null) isDeliveryPriceProvidedRX.postRxValueBasedOnEditText(it)
+            if (it != null) nsh.isDeliveryPriceProvidedRX.postRxValueBasedOnEditText(it)
         }
 
         binding.delivery.setOnCheckedChangeListener { _, isChecked ->
-            isShipmentAndOptionRX.onNext(isChecked)
+            nsh.isShipmentAndOptionRX.onNext(isChecked)
         }
 
         binding.personalPickup.setOnCheckedChangeListener { _, isChecked ->
-            isPersonalPickupAnOptionRX.onNext(isChecked)
+            nsh.isPersonalPickupAnOptionRX.onNext(isChecked)
         }
 
         binding.submitItemButton.setOnClickListener {
             viewModel.addPicturesToCloud()
-            showLoadingDialog()
+            showLoadingDialog("Adding your item...")
             viewModel.getUriOfPicsInCloudLiveData().observe(viewLifecycleOwner, { cloudUriList ->
                 viewModel.picturesLiveData.observe(viewLifecycleOwner, { clientUriList ->
                     if (cloudUriList.size == clientUriList.size &&
@@ -169,7 +147,7 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
                     ) addThisItemToFirebase().addOnSuccessListener {
                         Log.i(TAG, "Item added successfully!")
                         viewModel.clearPicturesData()
-                        endLoadingAndContinue()
+                        endLoadingAndContinue(it)
                     }
                         .addOnFailureListener {
                             Log.i(TAG, "Item adding failed, handle error here.")
@@ -179,68 +157,81 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
             })
         }
 
-        isPictureProvidedRX.subscribe {
-            isPictureProvided = it
+        nsh.isPictureProvidedRX.subscribe {
+            nsh.isPictureProvided = it
             ifAllDataIsProvidedEnableSubmitButton()
         }
-        isCategoryProvidedRX.subscribe {
-            isCategoryProvided = it
+        nsh.isCategoryProvidedRX.subscribe {
+            nsh.isCategoryProvided = it
             ifAllDataIsProvidedEnableSubmitButton()
         }
-        isNameProvidedRX.subscribe {
-            isNameProvided = it
+        nsh.isNameProvidedRX.subscribe {
+            nsh.isNameProvided = it
             ifAllDataIsProvidedEnableSubmitButton()
         }
-        isPriceProvidedRX.subscribe {
-            isPriceProvided = it
+        nsh.isPriceProvidedRX.subscribe {
+            nsh.isPriceProvided = it
             ifAllDataIsProvidedEnableSubmitButton()
         }
-        isDescProvidedRX.subscribe {
-            isDescProvided = it
+        nsh.isDescProvidedRX.subscribe {
+            nsh.isDescProvided = it
             ifAllDataIsProvidedEnableSubmitButton()
         }
 
-        isShipmentAndOptionRX.subscribe {
-            isShipmentAnOption = it
-            if (isShipmentAnOption) binding.itemDeliveryPriceLayout.makeVisible()
+        nsh.isShipmentAndOptionRX.subscribe {
+            nsh.isShipmentAnOption = it
+            if (nsh.isShipmentAnOption) binding.itemDeliveryPriceLayout.makeVisible()
             else binding.itemDeliveryPriceLayout.makeGone()
             ifAllDataIsProvidedEnableSubmitButton()
         }
 
-        isPersonalPickupAnOptionRX.subscribe {
-            isPersonalPickupAnOption = it
+        nsh.isPersonalPickupAnOptionRX.subscribe {
+            nsh.isPersonalPickupAnOption = it
             ifAllDataIsProvidedEnableSubmitButton()
         }
 
-        isDeliveryPriceProvidedRX.subscribe {
-            isDeliveryPriceProvided = it
+        nsh.isDeliveryPriceProvidedRX.subscribe {
+            nsh.isDeliveryPriceProvided = it
             ifAllDataIsProvidedEnableSubmitButton()
         }
 
-        isItemConditionPickedRX.subscribe {
-            isItemConditionPicked = it
+        nsh.isItemConditionPickedRX.subscribe {
+            nsh.isItemConditionPicked = it
             ifAllDataIsProvidedEnableSubmitButton()
         }
 
         return view
     }
 
-    private fun showLoadingDialog() {
+    private fun showLoadingDialog(message: String) {
         alertDialog = AlertDialog.Builder(requireContext())
             .setView(ProgressBar(requireContext()))
-            .setMessage("Adding your item...")
+            .setMessage(message)
             .show()
     }
 
-    private fun showSuccessDialog() {
+    private fun showSuccessDialog(addedItemDocRef: DocumentReference) {
         alertDialog = AlertDialog.Builder(requireContext())
-            .setMessage("Your item was added successfully!")
+            .setMessage(R.string.item_added_successfully)
             .setPositiveButton("Show added item", null)
             .setNegativeButton("Back", null)
             .show()
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            TODO("When this is clicked [ItemFragment] with just added item should be opened, I'll leave this todo in here since I don't have [ItemFragment yet].")
+            alertDialog.dismiss()
+            showLoadingDialog("Loading...")
+            addedItemDocRef.get().addOnSuccessListener { docRef ->
+                docRef.toObject(Item::class.java)?.let { it -> viewModel.setItemToPresent(it) }
+                endLoading()
+                Utils.openFragment(
+                    ItemFragment.newInstance(),
+                    ItemFragment.TAG,
+                    this.parentFragmentManager
+                )
+            }
+                .addOnFailureListener {
+                    Log.i(TAG, "Error, handle failure here.")
+                }
         }
     }
 
@@ -251,10 +242,10 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
             .show()
     }
 
-    private fun endLoadingAndContinue() {
+    private fun endLoadingAndContinue(addedItemDocRef: DocumentReference) {
         endLoading()
         clearAddedItemData()
-        showSuccessDialog()
+        showSuccessDialog(addedItemDocRef)
     }
 
     private fun clearAddedItemData() {
@@ -268,75 +259,25 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
         alertDialog.dismiss()
     }
 
-    private fun isAnyPickupOptionChecked(): Boolean {
-        return (isShipmentAnOption || isPersonalPickupAnOption)
-    }
-
-    private fun isShipmentDataProvidedIfNecessary(): Boolean {
-        return if (!isShipmentAnOption) true
-        else (isShipmentAnOption && isDeliveryPriceProvided)
-    }
-
     private fun ifAllDataIsProvidedEnableSubmitButton() {
-        if (isPictureProvided &&
-            isCategoryProvided &&
-            isNameProvided &&
-            isPriceProvided &&
-            isDescProvided &&
-            isItemConditionPicked &&
-            isShipmentDataProvidedIfNecessary() &&
-            isAnyPickupOptionChecked()
-        ) {
-            binding.submitItemButton.enable()
-            clearErrorTextView()
-        } else {
-            binding.submitItemButton.disable()
-            setSubmitErrorTextView()
-        }
-    }
-
-    private fun clearErrorTextView() {
-        binding.submitErrorTextView.text = ""
-    }
-
-    private fun setSubmitErrorTextView() {
-        val list = listOf(
-            isNameProvided,
-            isDescProvided,
-            isPriceProvided,
-            isPictureProvided,
-            isCategoryProvided,
-            isItemConditionPicked,
-            isShipmentDataProvidedIfNecessary(),
-            isAnyPickupOptionChecked()
-        ).filter { !it }
-        if (list.size > 1) binding.submitErrorTextView.text = getString(R.string.provideAllData)
-        else binding.submitErrorTextView.text = findErrorMessage()
-    }
-
-    private fun findErrorMessage(): String {
-        return when {
-            !isNameProvided -> "Item name must be provided."
-            !isDescProvided -> "Item description must be provided."
-            !isPriceProvided -> "Item price must be provided."
-            !isPictureProvided -> "Item must have at least 1 picture."
-            !isCategoryProvided -> "Item must have category."
-            !isItemConditionPicked -> "Item condition must be provided."
-            !isShipmentDataProvidedIfNecessary() -> "You must provide delivery price."
-            !isAnyPickupOptionChecked() -> "At least one pickup option must be chosen."
-            else -> ""
-        }
+        if (nsh.isAllDataProvided()) binding.submitItemButton.enable()
+        else binding.submitItemButton.disable()
+        binding.submitErrorTextView.text = nsh.getErrorMessage(requireContext())
     }
 
     private fun addThisItemToFirebase(): Task<DocumentReference> {
         val pickupOptions = mutableListOf<PickupOption>()
-        if (isShipmentAnOption) pickupOptions.add(Constants.shipment)
-        if (isPersonalPickupAnOption) pickupOptions.add(Constants.personalPickup)
+        var deliveryPrice: Double? = null
+        if (nsh.isShipmentAnOption) {
+            pickupOptions.add(Constants.shipment)
+            deliveryPrice = binding.itemDeliveryPriceInput.text.toString().toDouble()
+        }
+        if (nsh.isPersonalPickupAnOption) pickupOptions.add(Constants.personalPickup)
         return viewModel.addItemToFirebase(
             binding.itemNameInput.text.toString(),
             binding.itemDescInput.text.toString(),
             binding.itemPriceInput.text.toString().toDouble(),
-            binding.itemDeliveryPriceInput.text.toString().toDouble(),
+            deliveryPrice,
             chosenCondition,
             binding.itemSizeInput.text.toString(),
             pickupOptions
@@ -487,6 +428,6 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         chosenCondition = conditionList[position].name
-        isItemConditionPickedRX.onNext(true)
+        nsh.isItemConditionPickedRX.onNext(true)
     }
 }

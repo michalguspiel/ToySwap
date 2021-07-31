@@ -1,4 +1,4 @@
 package com.erdees.toyswap.model.models.item
 
-class PickupOption(val name: String) {
+class PickupOption(val name: String = "") {
 }
