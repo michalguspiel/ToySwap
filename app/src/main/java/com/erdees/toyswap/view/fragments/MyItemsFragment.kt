@@ -31,4 +31,9 @@ class MyItemsFragment : Fragment() {
         const val TAG = "MyItemsFragment"
         fun newInstance() : MyItemsFragment = MyItemsFragment()
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
