@@ -27,8 +27,8 @@ import com.erdees.toyswap.Utils.setMargins
 import com.erdees.toyswap.databinding.FragmentAddItemBinding
 import com.erdees.toyswap.databinding.PictureGridItemBinding
 import com.erdees.toyswap.model.Constants
+import com.erdees.toyswap.model.localDatabase.ItemCondition
 import com.erdees.toyswap.model.models.item.Item
-import com.erdees.toyswap.model.models.item.ItemConditions
 import com.erdees.toyswap.model.models.item.PickupOption
 import com.erdees.toyswap.view.fragments.ItemFragment
 import com.erdees.toyswap.view.fragments.dialogs.ChooseCategoryDialog
@@ -57,7 +57,7 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
         ChooseCategoryDialog.newInstance()
     }
 
-    private val conditionList = ItemConditions().listOfItemConditions
+    private lateinit var conditionList : List<ItemCondition>
     private var chosenCondition: String = ""
 
     private val nsh = AddItemFragmentNullSafetyHandler()
@@ -84,6 +84,8 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
         _binding = FragmentAddItemBinding.inflate(inflater, container, false)
         val view = binding.root
         viewModel = ViewModelProvider(this).get(AddItemFragmentViewModel::class.java)
+
+        conditionList = viewModel.getItemConditions()
 
         ifAllDataIsProvidedEnableSubmitButton()
 

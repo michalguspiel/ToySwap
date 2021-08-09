@@ -48,6 +48,4 @@ class BrowserFragment : Fragment(){
         _binding = null
     }
 
-
-
 }

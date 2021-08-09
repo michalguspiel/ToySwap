@@ -7,6 +7,8 @@ import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
 import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
 import com.erdees.toyswap.model.firebaseQuery.ItemDao
 import com.erdees.toyswap.model.firebaseQuery.ItemRepository
+import com.erdees.toyswap.model.localDatabase.LocalDatabase
+import com.erdees.toyswap.model.localDatabase.LocalRepository
 import com.erdees.toyswap.model.models.item.Item
 import com.erdees.toyswap.model.models.item.PickupOption
 import com.erdees.toyswap.model.repositories.CategoryRepository
@@ -25,13 +27,15 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
 
     private var authUserRepository: AuthUserRepository
 
+    private var localDatabaseRepository : LocalRepository
 
     init {
+        val localDatabaseDao = LocalDatabase.getDatabase(application).itemConditionDao()
         val itemDao = ItemDao.getInstance()
         itemRepository = ItemRepository(itemDao)
         val authDao = AuthUserDao.getInstance(application)
         authUserRepository = AuthUserRepository(authDao)
-
+        localDatabaseRepository = LocalRepository(localDatabaseDao)
     }
 
     fun getUserId() = authUserRepository.getUserLiveData().value?.uid
@@ -91,5 +95,7 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
     }
 
     fun setItemToPresent(item: Item) = itemRepository.setItemToPresent(item)
+
+    fun getItemConditions() = localDatabaseRepository.getItemConditions()
 
 }
