@@ -22,6 +22,17 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation":"$projectDir/schemas".toString(),
+                        "room.incremental":"true",
+                        "room.expandProjection":"true"]
+            }
+        }
+
+
     }
 
     testOptions{
@@ -51,6 +62,7 @@ android {
 
 dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.room:room-common:2.2.6'
     def nav_version = "2.3.5"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -118,6 +130,12 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$hilt_version")
     kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
 
+    /**ROOM*/
+    def room_version = "2.4.0-alpha04"
+    kapt("androidx.room:room-compiler:$room_version")
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    implementation("androidx.room:room-runtime:$room_version")
+
 
     /**TESTS*/
     testImplementation 'junit:junit:4.13.2'
@@ -132,6 +150,9 @@ dependencies {
     // - Test helper for LiveData
     testImplementation("androidx.arch.core:core-testing:$arch_version")
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.21.0'
+
+    // / Test helper for ROOM
+    testImplementation("androidx.room:room-testing:$room_version")
 
 
 
