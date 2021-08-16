@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import com.erdees.toyswap.Utils.makeSnackbar
-import com.erdees.toyswap.Utils.makeToast
+import com.erdees.toyswap.model.utils.Utils.makeSnackbar
+import com.erdees.toyswap.model.utils.Utils.makeToast
 import com.erdees.toyswap.databinding.DialogReAuthenticateBinding
 import com.erdees.toyswap.viewModel.ReAuthViewModel
 import com.google.firebase.auth.EmailAuthProvider

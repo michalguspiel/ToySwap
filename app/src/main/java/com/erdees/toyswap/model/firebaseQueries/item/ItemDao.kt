@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model.firebaseQuery
+package com.erdees.toyswap.model.firebaseQueries.item
 
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
@@ -60,7 +60,7 @@ class ItemDao {
         private var instance : ItemDao? = null
     fun getInstance() = instance ?: synchronized(this){
         instance
-            ?: ItemDao().also{instance = it}
+            ?: ItemDao().also{ instance = it}
     }
     }
 

@@ -1,10 +1,15 @@
 package com.erdees.toyswap.model
 
-import com.erdees.toyswap.model.models.item.PickupOption
+import com.erdees.toyswap.model.models.item.itemPickupOption.PickupOption
 
 object Constants {
+
+
+
     val shipment = PickupOption("Shipment")
     val personalPickup = PickupOption("Personal pickup")
+
+    const val STARTING_CATEGORY_ID = 0
 
     const val REQUEST_CODE = 149
     const val RC_SIGN_IN = 21415

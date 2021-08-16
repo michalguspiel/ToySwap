@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model.firebaseQuery
+package com.erdees.toyswap.model.firebaseQueries.seller
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData

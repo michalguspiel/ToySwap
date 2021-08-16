@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model.firebaseQuery
+package com.erdees.toyswap.model.firebaseQueries.item
 
 import androidx.lifecycle.LifecycleOwner
 import com.erdees.toyswap.model.models.item.Item

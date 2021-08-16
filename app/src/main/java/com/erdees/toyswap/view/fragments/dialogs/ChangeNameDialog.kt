@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import com.erdees.toyswap.Utils.endLoading
-import com.erdees.toyswap.Utils.showLoading
+import com.erdees.toyswap.model.utils.Utils.endLoading
+import com.erdees.toyswap.model.utils.Utils.showLoading
 import com.erdees.toyswap.databinding.DialogChangeNameBinding
 import com.erdees.toyswap.viewModel.ChangeNameDialogViewModel
 

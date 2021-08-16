@@ -1,9 +1,0 @@
-{
-  "itemConditions":[
-    {"id" :  0,"itemCondition":  "Brand new"},
-    {"id" :  1,"itemCondition":  "Slightly used"},
-    {"id" :  2,"itemCondition":  "Well used"},
-    {"id" :  3,"itemCondition":  "Damaged"},
-    {"id" :  4,"itemCondition":  "Broken"}
-  ]
-}

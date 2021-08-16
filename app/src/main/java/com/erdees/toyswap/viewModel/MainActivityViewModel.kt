@@ -10,7 +10,7 @@ class MainActivityViewModel(application: Application): AndroidViewModel(applicat
 
     private val authUserRepository : AuthUserRepository
 
-    private val categoryRepository = CategoryRepository.getInstance()
+    private val categoryRepository = CategoryRepository.getInstance(application)
 
     init {
         val authDao = AuthUserDao.getInstance(application)

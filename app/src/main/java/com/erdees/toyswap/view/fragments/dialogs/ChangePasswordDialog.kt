@@ -11,11 +11,11 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import com.erdees.toyswap.Utils.endLoading
-import com.erdees.toyswap.Utils.makeToast
-import com.erdees.toyswap.Utils.showLoading
+import com.erdees.toyswap.model.utils.Utils.endLoading
+import com.erdees.toyswap.model.utils.Utils.makeToast
+import com.erdees.toyswap.model.utils.Utils.showLoading
 import com.erdees.toyswap.databinding.DialogChangePasswordBinding
-import com.erdees.toyswap.model.Registration
+import com.erdees.toyswap.model.utils.Registration
 import com.erdees.toyswap.viewModel.ChangePasswordDialogViewModel
 import com.google.firebase.auth.FirebaseUser
 

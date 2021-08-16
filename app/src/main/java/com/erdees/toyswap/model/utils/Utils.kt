@@ -1,4 +1,4 @@
-package com.erdees.toyswap
+package com.erdees.toyswap.model.utils
 
 import android.content.Context
 import android.net.Uri
@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.erdees.toyswap.R
 import com.google.android.material.snackbar.Snackbar
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
