@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model
+package com.erdees.toyswap.model.utils
 
 class Reputation(reputation : Long){
 

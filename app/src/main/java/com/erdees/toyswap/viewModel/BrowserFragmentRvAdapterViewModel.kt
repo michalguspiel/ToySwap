@@ -1,8 +1,8 @@
 package com.erdees.toyswap.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.erdees.toyswap.model.firebaseQuery.ItemDao
-import com.erdees.toyswap.model.firebaseQuery.ItemRepository
+import com.erdees.toyswap.model.firebaseQueries.item.ItemDao
+import com.erdees.toyswap.model.firebaseQueries.item.ItemRepository
 import com.erdees.toyswap.model.models.item.Item
 
 class BrowserFragmentRvAdapterViewModel: ViewModel() {

@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.R
-import com.erdees.toyswap.Utils
+import com.erdees.toyswap.model.utils.Utils
 import com.erdees.toyswap.databinding.ActivityMainBinding
 import com.erdees.toyswap.view.fragments.*
 import com.erdees.toyswap.view.fragments.addItemFragment.AddItemFragment
@@ -68,16 +68,16 @@ class MainActivity : AppCompatActivity() {
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.nav_myAccountFragment -> {
-                    if(!isUserLoggedOut)Utils.openFragment(myAccountFragment,MyAccountFragment.TAG,supportFragmentManager)
+                    if(!isUserLoggedOut) Utils.openFragment(myAccountFragment,MyAccountFragment.TAG,supportFragmentManager)
                     else openLoginActivity()
                 }
                 R.id.nav_messagesFragment -> {
-                     if(!isUserLoggedOut)Utils.openFragment(chatFragment,
+                     if(!isUserLoggedOut) Utils.openFragment(chatFragment,
                          ChatFragment.TAG,supportFragmentManager)
                     else  openLoginActivity()
                 }
                 R.id.nav_inventoryFragment -> {
-                    if(!isUserLoggedOut)Utils.openFragment(myItemsFragment,MyItemsFragment.TAG,supportFragmentManager)
+                    if(!isUserLoggedOut) Utils.openFragment(myItemsFragment,MyItemsFragment.TAG,supportFragmentManager)
                     else openLoginActivity()
                 }
                 else -> {}

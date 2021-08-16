@@ -1,13 +1,11 @@
 package com.erdees.toyswap.model.models.item
 
+import com.erdees.toyswap.model.models.item.itemPickupOption.PickupOption
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 
 data class Item(
     val name: String = "",
-    val category: ItemCategoryFirebase = ItemCategoryFirebase("",null,
-        Firebase.firestore.document("")),
+    val category: String = "",
     val description: String = "",
     val size : String = "",
     val itemCondition: String = "",

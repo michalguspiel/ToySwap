@@ -1,8 +1,9 @@
 package com.erdees.toyswap
 
+import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.erdees.toyswap.model.models.item.ItemCategoriesHandler
+import com.erdees.toyswap.model.utils.ItemCategoriesHandler
 import com.google.firebase.FirebaseApp
 import junit.framework.Assert.assertEquals
 import org.junit.Before
@@ -14,7 +15,7 @@ import org.junit.runner.RunWith
 class CategoriesInstrumentedTest {
 
     private lateinit var category: ItemCategoriesHandler
-    val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+    private val appContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
 
     @Before
@@ -58,7 +59,7 @@ class CategoriesInstrumentedTest {
     @Test
     fun givenIJustPickedSportsCategoryAndThenPickedPreviousCategory_CurrentCategoryShouldBeMainCategory(){
         category.pickCategory(ItemCategoriesHandler.Sports)
-        assertEquals(category.currentCategory,ItemCategoriesHandler.Sports)
+        assertEquals(category.currentCategory, ItemCategoriesHandler.Sports)
         category.pickPreviousCategory()
         assertEquals(ItemCategoriesHandler.MainCategory,category.currentCategory)
     }
@@ -66,14 +67,18 @@ class CategoriesInstrumentedTest {
     @Test
     fun givenIJustPickedSportsCategory_CurrentCategoryChildrenShouldBeBikesTeamsportsIndividualsports(){
         category.pickCategory(ItemCategoriesHandler.Sports)
-        assertEquals(category.currentCategory,ItemCategoriesHandler.Sports)
-        assertEquals(listOf(ItemCategoriesHandler.Bikes,ItemCategoriesHandler.Teamsports,ItemCategoriesHandler.Individualsports),category.currentCategory.children)
+        assertEquals(category.currentCategory, ItemCategoriesHandler.Sports)
+        assertEquals(listOf(
+            ItemCategoriesHandler.Bikes,
+            ItemCategoriesHandler.Teamsports,
+            ItemCategoriesHandler.Individualsports),category.currentCategory.children)
     }
 
     @Test
     fun givenIJustPickedToys_CurrentCategoryChildrenShouldBeDollsAndCars(){
         category.pickCategory(ItemCategoriesHandler.Toys)
-        assertEquals(category.currentCategory.children,listOf(ItemCategoriesHandler.Cars,
+        assertEquals(category.currentCategory.children,listOf(
+            ItemCategoriesHandler.Cars,
             ItemCategoriesHandler.Dolls
         ))
     }
@@ -82,11 +87,11 @@ class CategoriesInstrumentedTest {
     fun givenImGoingToBePickingCategoriesUntillIReachCarsAndThenGoingBack_EverthingShouldWork(){
         category.pickCategory(ItemCategoriesHandler.Kids)
         category.pickCategory(ItemCategoriesHandler.Dolls)
-        assertEquals(category.currentCategory,ItemCategoriesHandler.Dolls)
+        assertEquals(category.currentCategory, ItemCategoriesHandler.Dolls)
         category.pickPreviousCategory()
         assertEquals(category.currentCategory, ItemCategoriesHandler.Kids)
         category.pickPreviousCategory()
-        assertEquals(category.currentCategory,ItemCategoriesHandler.MainCategory)
+        assertEquals(category.currentCategory, ItemCategoriesHandler.MainCategory)
     }
 
 }

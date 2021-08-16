@@ -11,12 +11,12 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.toyswap.R
-import com.erdees.toyswap.Utils.ignoreFirst
-import com.erdees.toyswap.Utils.makeGone
-import com.erdees.toyswap.Utils.makeVisible
+import com.erdees.toyswap.model.utils.Utils.ignoreFirst
+import com.erdees.toyswap.model.utils.Utils.makeGone
+import com.erdees.toyswap.model.utils.Utils.makeVisible
 import com.erdees.toyswap.databinding.DialogChooseCategoryBinding
-import com.erdees.toyswap.model.models.item.ItemCategoriesHandler
-import com.erdees.toyswap.model.models.item.ItemCategory
+import com.erdees.toyswap.model.utils.ItemCategoriesHandler
+import com.erdees.toyswap.model.models.item.itemCategory.ItemCategory
 import com.erdees.toyswap.viewModel.ChooseCategoryDialogViewModel
 
 

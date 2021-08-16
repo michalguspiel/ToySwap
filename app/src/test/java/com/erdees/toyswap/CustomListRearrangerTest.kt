@@ -1,6 +1,6 @@
 package com.erdees.toyswap
 
-import com.erdees.toyswap.model.CustomListRearranger.rearrange
+import com.erdees.toyswap.model.utils.CustomListRearranger.rearrange
 import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

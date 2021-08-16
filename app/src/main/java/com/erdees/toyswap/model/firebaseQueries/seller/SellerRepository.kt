@@ -1,4 +1,4 @@
-package com.erdees.toyswap.model.firebaseQuery
+package com.erdees.toyswap.model.firebaseQueries.seller
 
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot

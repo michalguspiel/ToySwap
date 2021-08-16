@@ -1,13 +1,14 @@
 package com.erdees.toyswap.viewModel
 
-import androidx.lifecycle.ViewModel
-import com.erdees.toyswap.model.models.item.ItemCategory
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import com.erdees.toyswap.model.models.item.itemCategory.ItemCategory
 import com.erdees.toyswap.model.repositories.CategoryRepository
 
-class ChooseCategoryDialogViewModel : ViewModel() {
+class ChooseCategoryDialogViewModel(application: Application) : AndroidViewModel(application) {
 
 
-    private val categoryRepository = CategoryRepository.getInstance()
+    private val categoryRepository = CategoryRepository.getInstance(application)
 
     fun clearItemCategoriesHandler() = categoryRepository.clearItemCategoriesHandler()
 

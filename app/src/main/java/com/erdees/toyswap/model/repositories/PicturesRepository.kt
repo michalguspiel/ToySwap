@@ -3,7 +3,7 @@ package com.erdees.toyswap.model.repositories
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.erdees.toyswap.model.CustomListRearranger.rearrange
+import com.erdees.toyswap.model.utils.CustomListRearranger.rearrange
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage

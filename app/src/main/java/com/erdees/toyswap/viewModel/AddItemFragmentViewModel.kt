@@ -5,12 +5,12 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
 import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
-import com.erdees.toyswap.model.firebaseQuery.ItemDao
-import com.erdees.toyswap.model.firebaseQuery.ItemRepository
+import com.erdees.toyswap.model.firebaseQueries.item.ItemDao
+import com.erdees.toyswap.model.firebaseQueries.item.ItemRepository
 import com.erdees.toyswap.model.localDatabase.LocalDatabase
 import com.erdees.toyswap.model.localDatabase.LocalRepository
 import com.erdees.toyswap.model.models.item.Item
-import com.erdees.toyswap.model.models.item.PickupOption
+import com.erdees.toyswap.model.models.item.itemPickupOption.PickupOption
 import com.erdees.toyswap.model.repositories.CategoryRepository
 import com.erdees.toyswap.model.repositories.PicturesRepository
 import com.google.android.gms.tasks.Task
@@ -19,7 +19,7 @@ import com.google.firebase.firestore.DocumentReference
 
 class AddItemFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val categoryRepository = CategoryRepository.getInstance()
+    private val categoryRepository = CategoryRepository.getInstance(application)
 
     private val picturesRepository = PicturesRepository.getInstance()
 
