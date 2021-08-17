@@ -45,7 +45,6 @@ class ItemFragment : Fragment() {
         val view = binding.root
         viewModel = ViewModelProvider(this).get(ItemFragmentViewModel::class.java)
 
-        val test = R.drawable.ic_baseline_sports_24
 
         viewModel.getPresentedItem().observe(viewLifecycleOwner, { item ->
             if (item != null) {
@@ -92,7 +91,7 @@ class ItemFragment : Fragment() {
             LayoutInflater.from(requireContext())
                 .inflate(R.layout.item_additional_info_box, null, false)
         val thisBinding = ItemAdditionalInfoBoxBinding.bind(layout)
-        val categoryName = item.category.categoryName
+        val categoryName = item.category.name
         if (categoryName.isNotBlank() && categoryName != "null") {
             thisBinding.itemAdditionalInfoBoxTV.text = categoryName
             binding.additionalInformationLayout.addView(layout)
@@ -104,7 +103,7 @@ class ItemFragment : Fragment() {
             LayoutInflater.from(requireContext())
                 .inflate(R.layout.item_additional_info_box, null, false)
         val thisBinding = ItemAdditionalInfoBoxBinding.bind(layout)
-        thisBinding.itemAdditionalInfoBoxTV.text = "${item.itemCondition}"
+        thisBinding.itemAdditionalInfoBoxTV.text = item.itemCondition
         binding.additionalInformationLayout.addView(layout)
     }
 

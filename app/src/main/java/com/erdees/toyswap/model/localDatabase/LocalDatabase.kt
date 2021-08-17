@@ -10,7 +10,7 @@ import com.erdees.toyswap.model.models.item.itemCondition.ItemCondition
 /**
  * DATABASE WHERE ITEM CONDITIONS AND ITEM CATEGORIES ARE STORED, PURPOSE OF THIS IS TO NOT HAVE HARD CODED OBJECTS INSIDE APP.
  * */
-@Database(entities = [(ItemCondition::class),(ItemCategory::class)], version = 1)
+@Database(entities = [(ItemCondition::class),(ItemCategory::class),], version = 1)
 abstract class LocalDatabase : RoomDatabase() {
 
     abstract fun itemConditionDao(): ItemConditionDao

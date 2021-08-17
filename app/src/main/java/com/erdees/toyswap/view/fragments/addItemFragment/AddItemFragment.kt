@@ -91,8 +91,8 @@ class AddItemFragment : Fragment(), AdapterView.OnItemClickListener {
 
         viewModel.categoryLiveData.observe(viewLifecycleOwner, {
             if (it != null) {
-                Log.i(TAG, "Picked category  = ${it.categoryName}")
-                binding.itemChosenCategory.text = it.categoryName
+                Log.i(TAG, "Picked category  = ${it.name}")
+                binding.itemChosenCategory.text = it.name
                 binding.itemChooseCategoryBtn.text = getString(R.string.change_category)
                 nsh.isCategoryProvidedRX.onNext(true)
             }

@@ -1,27 +1,29 @@
 package com.erdees.toyswap.view.fragments.dialogs
 
 import android.content.DialogInterface
-import android.graphics.drawable.Icon
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.erdees.toyswap.R
+import com.erdees.toyswap.databinding.DialogChooseCategoryBinding
+import com.erdees.toyswap.model.Constants.STARTING_CATEGORY_ID
+import com.erdees.toyswap.model.models.item.itemCategory.ItemCategory
+import com.erdees.toyswap.model.utils.ItemCategoriesHandler
 import com.erdees.toyswap.model.utils.Utils.ignoreFirst
 import com.erdees.toyswap.model.utils.Utils.makeGone
 import com.erdees.toyswap.model.utils.Utils.makeVisible
-import com.erdees.toyswap.databinding.DialogChooseCategoryBinding
-import com.erdees.toyswap.model.utils.ItemCategoriesHandler
-import com.erdees.toyswap.model.models.item.itemCategory.ItemCategory
 import com.erdees.toyswap.viewModel.ChooseCategoryDialogViewModel
 
 
 class ChooseCategoryDialog : DialogFragment() {
-
+ /** TODO  FIX BUG WHERE AFTER PRESSING BACK BUTTON HEADLINE DOESNT CHANGE*/
 
     private var _binding: DialogChooseCategoryBinding? = null
     private val binding get() = _binding!!
@@ -45,9 +47,9 @@ class ChooseCategoryDialog : DialogFragment() {
             if (category != null) this.dismiss()
         })
 
-        viewModel.categoriesLiveData.observe(viewLifecycleOwner, { itemCategories ->
-            updateUi(itemCategories)
-            currentCategory = itemCategories.currentCategory
+        viewModel.categoriesHandlerLiveData.observe(viewLifecycleOwner, { categoriesHandler ->
+            updateUi(categoriesHandler)
+            currentCategory = categoriesHandler.currentCategory
             if (isCurrentCategoryMainCategory()) binding.chooseCategoryBackBtn.makeGone()
             else binding.chooseCategoryBackBtn.makeVisible()
         })
@@ -67,38 +69,49 @@ class ChooseCategoryDialog : DialogFragment() {
 
     private fun updateUi(categoriesHandler: ItemCategoriesHandler) {
         binding.categoriesGridLayoutHolder.removeAllViews()
-        for (eachChild in categoriesHandler.currentCategory.children!!) {
+        for (eachChild in categoriesHandler.currentCategoryChildren()) {
             val eachCategoryCard =
                 LayoutInflater.from(requireContext()).inflate(R.layout.category_card, null, false)
             eachCategoryCard.findViewById<TextView>(R.id.categoryCardHead).text =
-                eachChild.categoryName
-            if (eachChild.icon != null) setCategoryIcon(eachCategoryCard, eachChild.icon)
+                eachChild.name
+            Log.i(TAG,eachChild.iconRef.toString())
+            if (!eachChild.iconRef.isNullOrBlank()) setCategoryIcon(eachCategoryCard,eachChild.icon)
             eachCategoryCard.setOnClickListener {
                 viewModel.pickCategory(eachChild)
                 binding.dialogChooseCategoryHead.text =
-                    categoriesHandler.currentCategory.categoryName
+                    categoriesHandler.currentCategory.name
             }
             binding.categoriesGridLayoutHolder.addView(eachCategoryCard)
         }
 
     }
 
-    private fun setCategoryIcon(view: View, icon: Icon) {
-        view.findViewById<ImageView>(R.id.categoryIcon).setImageIcon(icon)
-    }
+    private fun setCategoryIcon(view: View,iconId: Int?) {
+        if(iconId != null ) {
+            Glide.with(requireContext())
+                .load(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        iconId
+                    )
+                )
+                .into(view.findViewById(R.id.categoryIcon))
+        }
+        else Log.i(TAG,"NO ICON IN STATIC MAP")
+        }
 
     override fun onCancel(dialog: DialogInterface) {
-        viewModel.clearItemCategoriesHandler()
+        viewModel.restartItemCategoriesHandler()
         super.onCancel(dialog)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        viewModel.clearItemCategoriesHandler()
+        viewModel.restartItemCategoriesHandler()
         super.onDismiss(dialog)
     }
 
     private fun isCurrentCategoryMainCategory(): Boolean {
-        return currentCategory == ItemCategoriesHandler.MainCategory
+        return currentCategory.id == STARTING_CATEGORY_ID
     }
 
 }
