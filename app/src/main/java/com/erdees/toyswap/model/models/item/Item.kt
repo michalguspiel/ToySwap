@@ -1,11 +1,12 @@
 package com.erdees.toyswap.model.models.item
 
+import com.erdees.toyswap.model.models.item.itemCategory.ItemCategory
 import com.erdees.toyswap.model.models.item.itemPickupOption.PickupOption
 import com.google.firebase.Timestamp
 
 data class Item(
     val name: String = "",
-    val category: String = "",
+    val category: ItemCategory = ItemCategory(0,null,"",""),
     val description: String = "",
     val size : String = "",
     val itemCondition: String = "",

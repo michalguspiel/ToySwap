@@ -9,7 +9,7 @@ object Constants {
     val shipment = PickupOption("Shipment")
     val personalPickup = PickupOption("Personal pickup")
 
-    const val STARTING_CATEGORY_ID = 0
+    const val STARTING_CATEGORY_ID = 1
 
     const val REQUEST_CODE = 149
     const val RC_SIGN_IN = 21415
