@@ -1,10 +1,10 @@
 package com.erdees.toyswap.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.erdees.toyswap.model.firebaseQuery.ItemDao
-import com.erdees.toyswap.model.firebaseQuery.ItemRepository
-import com.erdees.toyswap.model.firebaseQuery.SellerDao
-import com.erdees.toyswap.model.firebaseQuery.SellerRepository
+import com.erdees.toyswap.model.firebaseQueries.item.ItemDao
+import com.erdees.toyswap.model.firebaseQueries.item.ItemRepository
+import com.erdees.toyswap.model.firebaseQueries.seller.SellerDao
+import com.erdees.toyswap.model.firebaseQueries.seller.SellerRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 

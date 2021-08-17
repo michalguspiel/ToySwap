@@ -4,22 +4,19 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
 import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
-import com.erdees.toyswap.model.repositories.CategoryRepository
 
-class MainActivityViewModel(application: Application): AndroidViewModel(application) {
+class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val authUserRepository : AuthUserRepository
 
-    private val categoryRepository = CategoryRepository.getInstance()
+    private val authUserRepository: AuthUserRepository
+
 
     init {
         val authDao = AuthUserDao.getInstance(application)
         authUserRepository = AuthUserRepository(authDao)
 
+
     }
-
-
-
     val userLiveData = authUserRepository.getUserLiveData()
     val isUserLoggedOut = authUserRepository.getIsUserLoggedOutLiveData()
 }

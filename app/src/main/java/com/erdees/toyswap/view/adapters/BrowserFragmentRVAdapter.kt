@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.erdees.toyswap.Utils
+import com.erdees.toyswap.model.utils.Utils
 import com.erdees.toyswap.databinding.ItemRecyclerItemBinding
 import com.erdees.toyswap.model.models.item.Item
 import com.erdees.toyswap.view.fragments.ItemFragment

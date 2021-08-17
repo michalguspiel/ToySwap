@@ -6,7 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import com.erdees.toyswap.model.Registration
+import com.erdees.toyswap.model.utils.Registration
 import com.erdees.toyswap.model.models.Address
 import com.erdees.toyswap.model.models.user.ToySwapUser
 import com.google.android.gms.tasks.Task

@@ -1,6 +1,6 @@
-package com.erdees.toyswap.model
+package com.erdees.toyswap.model.utils
 
-import com.erdees.toyswap.Utils.isEmailValid
+import com.erdees.toyswap.model.utils.Utils.isEmailValid
 
 class Registration(val password: String, private val confirmPassword: String, val mail: String) {
 

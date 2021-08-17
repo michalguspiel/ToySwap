@@ -2,7 +2,7 @@ package com.erdees.toyswap.viewModel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.erdees.toyswap.model.Registration
+import com.erdees.toyswap.model.utils.Registration
 import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
 import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
 import com.google.android.gms.tasks.Task

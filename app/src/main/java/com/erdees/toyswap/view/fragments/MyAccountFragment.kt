@@ -18,9 +18,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.erdees.toyswap.model.Constants
 import com.erdees.toyswap.model.Constants.REQUEST_CODE
-import com.erdees.toyswap.Utils.launchImageCrop
-import com.erdees.toyswap.Utils.makeGone
-import com.erdees.toyswap.Utils.makeVisible
+import com.erdees.toyswap.model.utils.Utils.launchImageCrop
+import com.erdees.toyswap.model.utils.Utils.makeGone
+import com.erdees.toyswap.model.utils.Utils.makeVisible
 import com.erdees.toyswap.databinding.FragmentMyAccountBinding
 import com.erdees.toyswap.view.activities.MainActivity
 import com.erdees.toyswap.view.fragments.dialogs.ChangeAddressDialog

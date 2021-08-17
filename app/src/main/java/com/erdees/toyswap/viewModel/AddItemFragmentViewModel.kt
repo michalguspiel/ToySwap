@@ -5,12 +5,13 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.toyswap.model.firebaseAuth.AuthUserDao
 import com.erdees.toyswap.model.firebaseAuth.AuthUserRepository
-import com.erdees.toyswap.model.firebaseQuery.ItemDao
-import com.erdees.toyswap.model.firebaseQuery.ItemRepository
+import com.erdees.toyswap.model.firebaseQueries.item.ItemDao
+import com.erdees.toyswap.model.firebaseQueries.item.ItemRepository
+import com.erdees.toyswap.model.localDatabase.ItemCategoryRepository
 import com.erdees.toyswap.model.localDatabase.LocalDatabase
 import com.erdees.toyswap.model.localDatabase.LocalRepository
 import com.erdees.toyswap.model.models.item.Item
-import com.erdees.toyswap.model.models.item.PickupOption
+import com.erdees.toyswap.model.models.item.itemPickupOption.PickupOption
 import com.erdees.toyswap.model.repositories.CategoryRepository
 import com.erdees.toyswap.model.repositories.PicturesRepository
 import com.google.android.gms.tasks.Task
@@ -19,7 +20,9 @@ import com.google.firebase.firestore.DocumentReference
 
 class AddItemFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val categoryRepository = CategoryRepository.getInstance()
+    private var itemCategoryRepository : ItemCategoryRepository
+
+    private var categoryRepository : CategoryRepository
 
     private val picturesRepository = PicturesRepository.getInstance()
 
@@ -32,13 +35,16 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
     init {
         val localDatabaseDao = LocalDatabase.getDatabase(application).itemConditionDao()
         val itemDao = ItemDao.getInstance()
-        itemRepository = ItemRepository(itemDao)
+        val itemCategoryDao = LocalDatabase.getDatabase(application).itemCategoryDao()
         val authDao = AuthUserDao.getInstance(application)
+        itemRepository = ItemRepository(itemDao)
+        itemCategoryRepository = ItemCategoryRepository(itemCategoryDao)
         authUserRepository = AuthUserRepository(authDao)
         localDatabaseRepository = LocalRepository(localDatabaseDao)
+        categoryRepository = CategoryRepository.getInstance(itemCategoryRepository)
     }
 
-    fun getUserId() = authUserRepository.getUserLiveData().value?.uid
+    private fun getUserId() = authUserRepository.getUserLiveData().value?.uid
 
     val categoryLiveData = categoryRepository.getCategoryLiveData()
 
@@ -78,7 +84,7 @@ class AddItemFragmentViewModel(application: Application) : AndroidViewModel(appl
         return itemRepository.addItemToFirebase(
             Item(
                 itemName,
-                category.toFirebaseItemCategory(),
+                category,// TODO MAKE SURE ITS CORRECT / DOESN'T NEED ANOTHER IMPLEMENTATION
                 itemDesc,
                 itemSize,
                 itemCondition,

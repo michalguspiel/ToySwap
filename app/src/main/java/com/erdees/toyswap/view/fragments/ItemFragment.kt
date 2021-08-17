@@ -12,14 +12,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.erdees.toyswap.R
-import com.erdees.toyswap.Utils.makeGone
-import com.erdees.toyswap.Utils.makeVisible
 import com.erdees.toyswap.databinding.FragmentItemBinding
 import com.erdees.toyswap.databinding.ItemAdditionalInfoBoxBinding
 import com.erdees.toyswap.model.Constants
-import com.erdees.toyswap.model.Reputation
 import com.erdees.toyswap.model.models.item.Item
 import com.erdees.toyswap.model.models.user.PublicUserData
+import com.erdees.toyswap.model.utils.Reputation
+import com.erdees.toyswap.model.utils.Utils.makeGone
+import com.erdees.toyswap.model.utils.Utils.makeVisible
 import com.erdees.toyswap.view.adapters.ItemPicturesRvAdapter
 import com.erdees.toyswap.viewModel.ItemFragmentViewModel
 import java.text.NumberFormat
@@ -44,6 +44,7 @@ class ItemFragment : Fragment() {
         _binding = FragmentItemBinding.inflate(inflater, container, false)
         val view = binding.root
         viewModel = ViewModelProvider(this).get(ItemFragmentViewModel::class.java)
+
 
         viewModel.getPresentedItem().observe(viewLifecycleOwner, { item ->
             if (item != null) {
@@ -90,7 +91,7 @@ class ItemFragment : Fragment() {
             LayoutInflater.from(requireContext())
                 .inflate(R.layout.item_additional_info_box, null, false)
         val thisBinding = ItemAdditionalInfoBoxBinding.bind(layout)
-        val categoryName = item.category.categoryName
+        val categoryName = item.category.name
         if (categoryName.isNotBlank() && categoryName != "null") {
             thisBinding.itemAdditionalInfoBoxTV.text = categoryName
             binding.additionalInformationLayout.addView(layout)
@@ -102,7 +103,7 @@ class ItemFragment : Fragment() {
             LayoutInflater.from(requireContext())
                 .inflate(R.layout.item_additional_info_box, null, false)
         val thisBinding = ItemAdditionalInfoBoxBinding.bind(layout)
-        thisBinding.itemAdditionalInfoBoxTV.text = "${item.itemCondition}"
+        thisBinding.itemAdditionalInfoBoxTV.text = item.itemCondition
         binding.additionalInformationLayout.addView(layout)
     }
 
