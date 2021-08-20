@@ -11,13 +11,13 @@ I consider the idea quite challenging but I'm taking my time into putting effort
 - Signing in/out
 
 ## Used Tech stack
--Kotlin
--ROOM
--MVVM
--SQLite
--RxJava
--Firebase
--JavaScript as cloud functions
+ - Kotlin
+ - ROOM
+ - MVVM
+ - SQLite
+ - RxJava
+ - Firebase
+ - JavaScript as cloud functions
 
 # TODO
 - Chat
