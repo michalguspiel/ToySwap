@@ -23,7 +23,6 @@ import com.erdees.toyswap.viewModel.ChooseCategoryDialogViewModel
 
 
 class ChooseCategoryDialog : DialogFragment() {
- /** TODO  FIX BUG WHERE AFTER PRESSING BACK BUTTON HEADLINE DOESNT CHANGE*/
 
     private var _binding: DialogChooseCategoryBinding? = null
     private val binding get() = _binding!!
@@ -52,6 +51,8 @@ class ChooseCategoryDialog : DialogFragment() {
             currentCategory = categoriesHandler.currentCategory
             if (isCurrentCategoryMainCategory()) binding.chooseCategoryBackBtn.makeGone()
             else binding.chooseCategoryBackBtn.makeVisible()
+            binding.dialogChooseCategoryHead.text =
+                categoriesHandler.currentCategory.name
         })
 
         binding.chooseCategoryBackBtn.setOnClickListener {
@@ -74,14 +75,12 @@ class ChooseCategoryDialog : DialogFragment() {
                 LayoutInflater.from(requireContext()).inflate(R.layout.category_card, null, false)
             eachCategoryCard.findViewById<TextView>(R.id.categoryCardHead).text =
                 eachChild.name
-            Log.i(TAG,eachChild.iconRef.toString())
             if (!eachChild.iconRef.isNullOrBlank()) setCategoryIcon(eachCategoryCard,eachChild.icon)
             eachCategoryCard.setOnClickListener {
                 viewModel.pickCategory(eachChild)
-                binding.dialogChooseCategoryHead.text =
-                    categoriesHandler.currentCategory.name
             }
             binding.categoriesGridLayoutHolder.addView(eachCategoryCard)
+
         }
 
     }
